@@ -8,10 +8,10 @@ import { useLightbox } from "./Lightbox";
 function PolaroidStack({ photos, caption }: { photos: string[]; caption: string }) {
   const openLightbox = useLightbox();
   return (
-    <div className="relative mx-auto h-[360px] w-[300px] sm:h-[420px] sm:w-[360px]">
+    <div className="relative mx-auto h-[290px] w-[225px] sm:h-[420px] sm:w-[360px]">
       {photos.map((src, i) => {
         const rot = i === 0 ? -5 : 4 + i * 2;
-        const offset = i * 16;
+        const offset = i * 12;
         return (
           <motion.div
             key={i}
@@ -26,7 +26,7 @@ function PolaroidStack({ photos, caption }: { photos: string[]; caption: string 
             <img
               src={src}
               alt=""
-              className="h-[260px] w-[260px] object-cover sm:h-[320px] sm:w-[320px]"
+              className="h-[195px] w-[195px] object-cover sm:h-[320px] sm:w-[320px]"
             />
             {i === 0 && (
               <span className="absolute bottom-2 left-0 right-0 text-center font-serif text-base italic text-stone">
@@ -45,7 +45,7 @@ function ChapterRow({ chapter, index }: { chapter: Chapter; index: number }) {
 
   const text = (
     <motion.div
-      className={`max-w-sm ${textFirst ? "text-right" : "text-left"}`}
+      className={`max-w-sm text-center ${textFirst ? "md:text-right" : "md:text-left"}`}
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.5 }}
@@ -82,7 +82,7 @@ export default function Story() {
     <section id="story" className="section-frost relative px-6 pb-24">
       <DecoTree src={decoTrees.pineA} side="left" width="clamp(110px, 13vw, 210px)" opacity={0.5} />
       <div className="sticky top-0 z-0 flex justify-center pt-28">
-        <h2 className="display text-7xl text-ink sm:text-8xl md:text-9xl">
+        <h2 className="display text-5xl text-ink sm:text-7xl md:text-8xl lg:text-9xl">
           {story.heading}
         </h2>
       </div>

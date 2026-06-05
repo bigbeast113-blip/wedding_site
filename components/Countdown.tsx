@@ -35,26 +35,26 @@ export default function Countdown() {
   ];
 
   return (
-    <section className="section-frost relative px-6 py-24 text-center">
+    <section id="countdown" className="section-frost relative px-4 py-24 text-center">
       <motion.div
-        className="mx-auto flex max-w-3xl items-end justify-center gap-3 sm:gap-8"
+        className="mx-auto flex max-w-3xl items-end justify-center gap-1.5 sm:gap-8"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.5 }}
         transition={{ duration: 0.8 }}
       >
         {units.map((u, i) => (
-          <div key={u.label} className="flex items-end gap-3 sm:gap-8">
+          <div key={u.label} className="flex items-end gap-1.5 sm:gap-8">
             <div className="flex flex-col items-center">
-              <span className="display text-5xl text-ink sm:text-7xl md:text-8xl">
+              <span className="display text-3xl text-ink sm:text-6xl md:text-8xl">
                 {u.value}
               </span>
-              <span className="mt-2 text-[0.6rem] uppercase tracking-[0.3em] text-stone sm:text-xs">
+              <span className="mt-2 text-[0.5rem] uppercase tracking-[0.2em] text-stone sm:text-xs sm:tracking-[0.3em]">
                 {u.label}
               </span>
             </div>
             {i < units.length - 1 && (
-              <span className="display pb-6 text-4xl text-stone/40 sm:text-6xl">:</span>
+              <span className="display pb-5 text-2xl text-stone/40 sm:pb-6 sm:text-5xl">:</span>
             )}
           </div>
         ))}
