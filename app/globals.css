@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-serif: "Cormorant Garamond", Georgia, serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  overflow-x: hidden; /* keep edge decorations from causing sideways scroll */
+}
+
+body {
+  background-color: #eaf1f6; /* cool winter fallback behind the WinterScene */
+  color: theme("colors.ink");
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Frosted-glass content panel so the winter landscape shows through while
+   keeping text readable. Replaces the old solid cream/paper section fills. */
+.section-frost {
+  background-color: rgba(244, 248, 251, 0.7);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+}
+
+@keyframes snowfall {
+  0% {
+    transform: translate3d(0, -5vh, 0);
+  }
+  100% {
+    transform: translate3d(var(--drift, 0px), 105vh, 0);
+  }
+}
+
+/* Slowly drifting fog band */
+@keyframes fogdrift {
+  0% {
+    transform: translateX(-5%);
+  }
+  50% {
+    transform: translateX(5%);
+  }
+  100% {
+    transform: translateX(-5%);
+  }
+}
+
+/* Fast wind-blown streak sweeping across the screen (page-transition blizzard) */
+@keyframes blizzardstreak {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(128vw, var(--drop, 30px), 0);
+    opacity: 0;
+  }
+}
+
+/* Thin, elegant scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: theme("colors.cream");
+}
+::-webkit-scrollbar-thumb {
+  background: theme("colors.stone");
+  border-radius: 999px;
+}
+
+/* Display serif helper used by big lowercase headings */
+.display {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 0.95;
+}
+
+/* Hide scrollbar where a section needs a clean look */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" role="img" aria-label="Foreground snowy branches and flowers transparent parallax layer">
+  <defs>
+    <linearGradient id="branch" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#172d34"/>
+      <stop offset="1" stop-color="#43636d"/>
+    </linearGradient>
+    <radialGradient id="frost" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#cbe5ee"/>
+    </radialGradient>
+    <filter id="soft">
+      <feGaussianBlur stdDeviation="0.6"/>
+    </filter>
+  </defs>
+
+  <rect width="1920" height="1080" fill="none"/>
+
+  <g opacity="0.96">
+    <path d="M-82 1076 C137 844 186 619 148 338 C138 262 158 171 230 72 C214 257 259 424 340 570 C424 722 446 909 397 1080 Z" fill="url(#branch)"/>
+    <path d="M2002 1078 C1776 843 1731 618 1771 335 C1782 253 1757 160 1683 61 C1704 262 1656 428 1576 572 C1493 722 1470 910 1520 1080 Z" fill="url(#branch)"/>
+  </g>
+
+  <g fill="url(#branch)" stroke="url(#branch)" stroke-linecap="round" stroke-width="24">
+    <path d="M140 395 C348 374 510 422 681 534" fill="none"/>
+    <path d="M181 543 C356 532 476 586 604 688" fill="none" opacity="0.88"/>
+    <path d="M1780 392 C1574 373 1407 423 1239 535" fill="none"/>
+    <path d="M1738 544 C1565 532 1440 586 1315 690" fill="none" opacity="0.88"/>
+  </g>
+
+  <g fill="#ffffff" opacity="0.94">
+    <path d="M49 693 C196 645 326 655 474 704 C291 686 168 692 49 693 Z"/>
+    <path d="M122 828 C292 779 455 792 635 852 C410 825 257 826 122 828 Z"/>
+    <path d="M1871 693 C1723 646 1593 656 1444 705 C1629 686 1752 691 1871 693 Z"/>
+    <path d="M1799 830 C1627 780 1462 793 1285 853 C1510 826 1662 827 1799 830 Z"/>
+  </g>
+
+  <g opacity="0.9">
+    <circle cx="170" cy="778" r="37" fill="url(#frost)"/>
+    <circle cx="263" cy="757" r="28" fill="url(#frost)"/>
+    <circle cx="354" cy="805" r="34" fill="url(#frost)"/>
+    <circle cx="502" cy="894" r="42" fill="url(#frost)"/>
+    <circle cx="103" cy="922" r="52" fill="url(#frost)"/>
+    <circle cx="1752" cy="778" r="37" fill="url(#frost)"/>
+    <circle cx="1657" cy="757" r="28" fill="url(#frost)"/>
+    <circle cx="1565" cy="805" r="34" fill="url(#frost)"/>
+    <circle cx="1418" cy="895" r="42" fill="url(#frost)"/>
+    <circle cx="1817" cy="921" r="52" fill="url(#frost)"/>
+  </g>
+
+  <g fill="#dceff5" opacity="0.9" filter="url(#soft)">
+    <circle cx="93" cy="503" r="11"/>
+    <circle cx="249" cy="426" r="8"/>
+    <circle cx="389" cy="463" r="10"/>
+    <circle cx="579" cy="540" r="8"/>
+    <circle cx="1828" cy="505" r="11"/>
+    <circle cx="1671" cy="426" r="8"/>
+    <circle cx="1530" cy="464" r="10"/>
+    <circle cx="1341" cy="541" r="8"/>
+  </g>
+</svg>

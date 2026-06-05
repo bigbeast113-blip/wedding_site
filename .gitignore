@@ -1,0 +1,30 @@
+# dependencies
+/node_modules
+
+# next.js build output
+/.next
+/out
+
+# vercel
+/.vercel
+
+# scratch / build artifacts (not needed to run or deploy)
+/_album
+/_assets
+/frames
+_*.py
+*.output
+example.mp4
+
+# python caches
+__pycache__/
+*.pyc
+
+# os
+.DS_Store
+Thumbs.db
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" role="img" aria-label="Distant snowy mountain portal backdrop">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6fa8cf"/>
+      <stop offset="0.42" stop-color="#c9e5f0"/>
+      <stop offset="1" stop-color="#f7fbfd"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="42%" r="33%">
+      <stop offset="0" stop-color="#fff8d6" stop-opacity="0.95"/>
+      <stop offset="0.34" stop-color="#ffeaa1" stop-opacity="0.46"/>
+      <stop offset="0.78" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="snow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#cfe0e8"/>
+    </linearGradient>
+    <filter id="soften">
+      <feGaussianBlur stdDeviation="2.5"/>
+    </filter>
+  </defs>
+
+  <rect width="1920" height="1080" fill="url(#sky)"/>
+  <rect width="1920" height="1080" fill="url(#glow)"/>
+
+  <path d="M0 604 C190 536 309 575 475 514 C650 450 752 333 906 382 C1042 425 1128 292 1278 338 C1443 390 1519 530 1704 501 C1802 486 1873 516 1920 545 L1920 1080 L0 1080 Z" fill="#8fb4c6" opacity="0.58"/>
+  <path d="M0 667 C187 612 334 642 514 577 C699 510 823 382 976 430 C1118 474 1194 342 1356 401 C1507 456 1577 611 1741 577 C1839 557 1892 592 1920 620 L1920 1080 L0 1080 Z" fill="#5e8da5" opacity="0.68"/>
+
+  <path d="M416 677 L708 306 L887 680 Z" fill="#dbe9ee"/>
+  <path d="M708 306 L803 680 L887 680 Z" fill="#9fbfcd"/>
+  <path d="M590 531 L708 306 L672 566 Z" fill="#ffffff" opacity="0.88"/>
+  <path d="M993 704 L1232 250 L1497 704 Z" fill="#eef6f8"/>
+  <path d="M1232 250 L1322 704 L1497 704 Z" fill="#a9c7d1"/>
+  <path d="M1137 496 L1232 250 L1212 571 Z" fill="#ffffff" opacity="0.9"/>
+  <path d="M765 717 L1002 214 L1305 717 Z" fill="#f8fdff"/>
+  <path d="M1002 214 L1110 717 L1305 717 Z" fill="#bad2dc"/>
+  <path d="M882 495 L1002 214 L970 607 Z" fill="#ffffff" opacity="0.92"/>
+
+  <path d="M0 794 C245 734 396 813 594 756 C776 704 968 695 1112 762 C1263 833 1431 739 1607 769 C1735 791 1840 833 1920 807 L1920 1080 L0 1080 Z" fill="url(#snow)"/>
+  <path d="M0 881 C250 822 449 889 651 836 C832 788 1012 789 1178 845 C1369 910 1513 831 1691 859 C1790 875 1856 895 1920 878 L1920 1080 L0 1080 Z" fill="#ffffff" opacity="0.86"/>
+
+  <g opacity="0.28" filter="url(#soften)">
+    <circle cx="173" cy="144" r="4" fill="#fff"/>
+    <circle cx="328" cy="226" r="3" fill="#fff"/>
+    <circle cx="509" cy="118" r="3.5" fill="#fff"/>
+    <circle cx="743" cy="202" r="2.5" fill="#fff"/>
+    <circle cx="902" cy="87" r="3" fill="#fff"/>
+    <circle cx="1134" cy="167" r="4" fill="#fff"/>
+    <circle cx="1398" cy="114" r="3" fill="#fff"/>
+    <circle cx="1626" cy="239" r="3.5" fill="#fff"/>
+    <circle cx="1810" cy="154" r="3" fill="#fff"/>
+  </g>
+</svg>
