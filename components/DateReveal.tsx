@@ -1,9 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { dateReveal, couple, decoTrees } from "@/content/wedding";
+import { dateReveal, couple, decoTrees, decoDogs } from "@/content/wedding";
 import Petals from "./Petals";
 import DecoTree from "./DecoTree";
+import { DogTrot } from "./DogScroll";
 
 export default function DateReveal() {
   return (
@@ -11,6 +12,7 @@ export default function DateReveal() {
       <Petals count={28} />
       <DecoTree src={decoTrees.left} side="left" width="clamp(64px, 16vw, 240px)" opacity={0.65} />
       <DecoTree src={decoTrees.pineB} side="right" width="clamp(72px, 18vw, 280px)" opacity={0.68} />
+      <DogTrot src={decoDogs.daisy} flip />
 
       <div className="relative z-10">
         <motion.p

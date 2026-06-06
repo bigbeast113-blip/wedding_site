@@ -36,6 +36,12 @@ export const splash = {
   cta: "Click to Enter",
 };
 
+// The pups, background removed, used as scroll animations.
+export const decoDogs = {
+  daisy: "/photos/cutouts/daisy.png", // side profile — trots across
+  duke: "/photos/cutouts/duke.png", // paws-forward — peeks over edges
+};
+
 // Watercolor pines (background removed) used as scroll decorations.
 export const decoTrees = {
   left: "/photos/cutouts/tree_left.png", // shorter, fuller pine

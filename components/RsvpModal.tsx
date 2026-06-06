@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { couple, rsvp } from "@/content/wedding";
+import Burst from "./Burst";
 
 const norm = (s: string) => s.trim().toLowerCase().replace(/\s+/g, " ");
 
@@ -260,6 +261,7 @@ export default function RsvpModal({
             {/* STEP 3 — confirmation */}
             {step === "done" && (
               <div className="py-8 text-center">
+                {attendingCount > 0 && <Burst />}
                 <h3 className="display text-4xl text-ink">thank you</h3>
                 <p className="mt-4 text-stone">
                   {attendingCount > 0

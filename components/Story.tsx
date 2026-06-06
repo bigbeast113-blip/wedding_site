@@ -93,6 +93,7 @@ export default function Story() {
     <section id="story" className="section-frost relative px-6 pb-20 pt-8 md:pb-24 md:pt-0">
       <DecoTree src={decoTrees.pineA} side="left" width="clamp(90px, 13vw, 210px)" opacity={0.5} />
 
+
       {/* Heading: static on mobile (so scrolling chapters can't cover it),
           sticky overlay only on desktop. */}
       <div className="relative z-0 flex justify-center md:sticky md:top-0 md:pt-28">

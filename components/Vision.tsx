@@ -2,8 +2,9 @@
 
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { vision, decoTrees } from "@/content/wedding";
+import { vision, decoTrees, decoDogs } from "@/content/wedding";
 import DecoTree from "./DecoTree";
+import { DogPeek } from "./DogScroll";
 
 export default function Vision() {
   const ref = useRef<HTMLDivElement>(null);
@@ -15,8 +16,9 @@ export default function Vision() {
   const words = vision.text.split(" ");
 
   return (
-    <section ref={ref} className="section-frost relative px-6 py-32">
-      <DecoTree src={decoTrees.right} side="right" width="clamp(95px, 11vw, 175px)" opacity={0.5} />
+    <section ref={ref} className="section-frost relative overflow-hidden px-6 py-32">
+      <DecoTree src={decoTrees.right} side="left" width="clamp(95px, 11vw, 175px)" opacity={0.5} />
+      <DogPeek src={decoDogs.duke} side="right" />
       <p className="mx-auto max-w-4xl text-center font-serif text-3xl leading-snug text-ink sm:text-4xl md:text-5xl">
         {words.map((word, i) => {
           const start = i / words.length;
