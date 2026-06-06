@@ -7,33 +7,44 @@ import { useLightbox } from "./Lightbox";
 
 function PolaroidStack({ photos, caption }: { photos: string[]; caption: string }) {
   const openLightbox = useLightbox();
+  const mid = (photos.length - 1) / 2;
   return (
-    <div className="relative mx-auto h-[290px] w-[225px] sm:h-[420px] sm:w-[360px]">
+    <div className="relative mx-auto h-[270px] w-[250px] sm:h-[430px] sm:w-[370px]">
       {photos.map((src, i) => {
-        const rot = i === 0 ? -5 : 4 + i * 2;
-        const offset = i * 12;
+        // Symmetric fan, centered on the container (the -50% keeps it centered
+        // even though Framer controls the transform).
+        const rot = (i - mid) * 7;
+        const tx = (i - mid) * 18;
+        const ty = (i - mid) * 10;
         return (
-          <motion.div
+          // Outer wrapper centers the photo (plain CSS). Inner motion element
+          // handles the fan animation — keeps centering and animation separate
+          // so Framer's transform can't undo the centering.
+          <div
             key={i}
-            onClick={() => openLightbox(src)}
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer rounded-sm bg-white p-3 pb-10 shadow-xl"
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
             style={{ zIndex: photos.length - i }}
-            initial={{ rotate: 0, x: 0, y: 0, opacity: 0 }}
-            whileInView={{ rotate: rot, x: offset, y: offset, opacity: 1 }}
-            viewport={{ once: true, amount: 0.4 }}
-            transition={{ duration: 0.7, delay: i * 0.15, ease: "easeOut" }}
           >
-            <img
-              src={src}
-              alt=""
-              className="h-[195px] w-[195px] object-cover sm:h-[320px] sm:w-[320px]"
-            />
-            {i === 0 && (
-              <span className="absolute bottom-2 left-0 right-0 text-center font-serif text-base italic text-stone">
-                {caption}
-              </span>
-            )}
-          </motion.div>
+            <motion.div
+              onClick={() => openLightbox(src)}
+              className="cursor-pointer rounded-sm bg-white p-2.5 pb-8 shadow-xl sm:p-3 sm:pb-10"
+              initial={{ rotate: 0, x: 0, y: 0, opacity: 0 }}
+              whileInView={{ rotate: rot, x: tx, y: ty, opacity: 1 }}
+              viewport={{ once: true, amount: 0.4 }}
+              transition={{ duration: 0.7, delay: i * 0.15, ease: "easeOut" }}
+            >
+              <img
+                src={src}
+                alt=""
+                className="h-[180px] w-[180px] object-cover sm:h-[320px] sm:w-[320px]"
+              />
+              {i === 0 && (
+                <span className="absolute bottom-1.5 left-0 right-0 text-center font-serif text-sm italic text-stone sm:bottom-2 sm:text-base">
+                  {caption}
+                </span>
+              )}
+            </motion.div>
+          </div>
         );
       })}
     </div>
@@ -61,7 +72,7 @@ function ChapterRow({ chapter, index }: { chapter: Chapter; index: number }) {
   const stack = <PolaroidStack photos={chapter.photos} caption={chapter.caption} />;
 
   return (
-    <div className="flex min-h-[80vh] flex-col items-center justify-center gap-12 py-16 md:flex-row md:gap-20">
+    <div className="flex flex-col items-center justify-center gap-10 py-12 md:min-h-[80vh] md:flex-row md:gap-20 md:py-16">
       {textFirst ? (
         <>
           {text}
@@ -79,15 +90,18 @@ function ChapterRow({ chapter, index }: { chapter: Chapter; index: number }) {
 
 export default function Story() {
   return (
-    <section id="story" className="section-frost relative px-6 pb-24">
-      <DecoTree src={decoTrees.pineA} side="left" width="clamp(110px, 13vw, 210px)" opacity={0.5} />
-      <div className="sticky top-0 z-0 flex justify-center pt-28">
+    <section id="story" className="section-frost relative px-6 pb-20 pt-8 md:pb-24 md:pt-0">
+      <DecoTree src={decoTrees.pineA} side="left" width="clamp(90px, 13vw, 210px)" opacity={0.5} />
+
+      {/* Heading: static on mobile (so scrolling chapters can't cover it),
+          sticky overlay only on desktop. */}
+      <div className="relative z-0 flex justify-center md:sticky md:top-0 md:pt-28">
         <h2 className="display text-5xl text-ink sm:text-7xl md:text-8xl lg:text-9xl">
           {story.heading}
         </h2>
       </div>
 
-      <div className="relative z-10 mx-auto -mt-16 max-w-5xl">
+      <div className="relative z-10 mx-auto mt-4 max-w-5xl md:-mt-16">
         {story.chapters.map((chapter, i) => (
           <ChapterRow key={i} chapter={chapter} index={i} />
         ))}

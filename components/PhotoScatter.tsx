@@ -27,19 +27,25 @@ function ScatterImg({
 }) {
   const pos = layout[i % layout.length];
   const openLightbox = useLightbox();
-  const x = useTransform(progress, [0, 1], ["0%", `${pos.x * scale}vw`]);
-  const y = useTransform(progress, [0, 1], ["0%", `${pos.y * scale}vh`]);
+  const x = useTransform(progress, [0, 1], ["0vw", `${pos.x * scale}vw`]);
+  const y = useTransform(progress, [0, 1], ["0vh", `${pos.y * scale}vh`]);
   const rotate = useTransform(progress, [0, 1], [0, pos.r]);
   const opacity = useTransform(progress, [0, 0.25, 1], [0, 1, 1]);
 
   return (
-    <motion.img
-      src={src}
-      alt=""
-      onClick={() => openLightbox(src)}
-      style={{ x, y, rotate, opacity, width: pos.w * scale }}
-      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer rounded-md border-[5px] border-white object-cover shadow-2xl sm:border-[6px]"
-    />
+    // Outer wrapper centers on the container (plain CSS); inner image scatters.
+    <div
+      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+      style={{ width: pos.w * scale }}
+    >
+      <motion.img
+        src={src}
+        alt=""
+        onClick={() => openLightbox(src)}
+        style={{ x, y, rotate, opacity }}
+        className="block w-full cursor-pointer rounded-md border-[5px] border-white object-cover shadow-2xl sm:border-[6px]"
+      />
+    </div>
   );
 }
 
