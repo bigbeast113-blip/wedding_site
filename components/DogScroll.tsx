@@ -1,33 +1,36 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 
-/** Daisy runs across the bottom of a section once it scrolls into view.
- *  Triggered by an on-screen sentinel so the dog can start off-screen. */
+/**
+ * Daisy is scroll-linked: as you scroll down she runs in from the left and
+ * settles next to the first tree on the left, staying there. Scroll back up
+ * and she runs back out — the animation reverses with scroll like the rest.
+ */
 export function DogTrot({
   src,
   width = "clamp(78px, 9vw, 130px)",
   flip = true,
-  duration = 5.5,
+  end = "5vw",
 }: {
   src: string;
   width?: string;
   flip?: boolean;
-  duration?: number;
+  end?: string;
 }) {
-  const trigger = useRef<HTMLSpanElement>(null);
-  const go = useInView(trigger, { once: true, margin: "0px 0px -15% 0px" });
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+  // Run in during the first part of the section, then hold at the tree.
+  const x = useTransform(scrollYProgress, [0.08, 0.5], ["-24vw", end]);
+  const opacity = useTransform(scrollYProgress, [0.05, 0.14], [0, 1]);
 
   return (
-    <>
-      <span ref={trigger} aria-hidden className="absolute bottom-1/4 left-1/2 h-px w-px" />
-      <motion.div
-        className="pointer-events-none absolute bottom-2 left-0 z-0 select-none"
-        initial={{ x: "-22vw", opacity: 0 }}
-        animate={go ? { x: "118vw", opacity: [0, 1, 1, 1, 0] } : { x: "-22vw", opacity: 0 }}
-        transition={{ duration, ease: "linear", opacity: { duration, times: [0, 0.06, 0.5, 0.94, 1] } }}
-      >
+    <div ref={ref} className="pointer-events-none absolute inset-0 z-0 select-none">
+      <motion.div className="absolute bottom-2 left-0" style={{ x, opacity }}>
         <img
           src={src}
           alt=""
@@ -36,7 +39,7 @@ export function DogTrot({
           style={{ width }}
         />
       </motion.div>
-    </>
+    </div>
   );
 }
 
