@@ -53,17 +53,17 @@ export const decoTrees = {
 
 export const hero = {
   // Full-bleed portrait behind the names (name sits low to keep faces visible).
-  image: "/photos/S63_2691-3264.jpg",
+  image: "/photos/new/img_3452.webp",
   scrollHint: "scroll to explore",
 };
 
 // Photos that scatter around the names as you scroll past the hero
 export const scatterPhotos: string[] = [
-  "/photos/S63_2561-3264.jpg",
-  "/photos/PXL_20251207_180632800.jpg",
-  "/photos/SZ6_7356-3264.jpg",
-  "/photos/PXL_20251201_023732914.jpg",
-  "/photos/SZ6_7201-3264.jpg",
+  "/photos/new/img_3477.webp",
+  "/photos/new/img_3456.webp",
+  "/photos/new/img_3458.webp",
+  "/photos/new/img_3475.webp",
+  "/photos/new/img_3482.webp",
 ];
 
 export type Chapter = {
@@ -80,19 +80,19 @@ export const story = {
       title: "chapter one: how we met",
       body: "It started with a message and a maybe. A few late-night conversations later, two strangers from the internet realized they had accidentally found the best part of their day in each other.",
       caption: "Where it all began",
-      photos: ["/photos/S63_2561-3264.jpg", "/photos/SZ6_7356-3264.jpg"],
+      photos: ["/photos/new/img_3463.webp", "/photos/new/img_3478.webp"],
     },
     {
       title: "chapter two: falling in love",
       body: "Somewhere between the inside jokes, the lazy Sunday mornings, and a very spoiled pair of dogs, “I like you” quietly grew into “I can’t imagine my life without you.”",
       caption: "Falling in love",
-      photos: ["/photos/PXL_20251207_180632800.jpg", "/photos/PXL_20251201_023732914.jpg"],
+      photos: ["/photos/new/img_3453.webp", "/photos/new/img_3481.webp"],
     },
     {
       title: "chapter three: the next step",
       body: "On a golden afternoon among the trees, a walk in the woods turned into a question — and a very easy yes. Suddenly the future we had been imagining had a date on it.",
       caption: "The proposal",
-      photos: ["/photos/S63_2691-3264.jpg", "/photos/SZ6_7201-3264.jpg"],
+      photos: ["/photos/new/img_3464.webp", "/photos/new/img_3486.webp"],
     },
   ] as Chapter[],
 };
@@ -362,7 +362,7 @@ export const weddingParty = {
 };
 
 export const closing = {
-  image: "/photos/SZ6_7356-3264.jpg",
+  image: "/photos/new/img_3494.webp",
   line: "you’re my favorite person to do anything with for the rest of my life.",
 };
 
@@ -378,6 +378,15 @@ export const rsvp = {
   //   { members: ["Jesse Abruzzo", "Francesca Primiani"] },
   //   { members: ["Roger Smith", "Jane Smith", "Smith Family +2"] },
   parties: [] as { members: string[] }[],
+  // Optional "how well do you know us" quiz shown before the RSVP. Free-text
+  // answers are saved to the Google Sheet (one "Trivia" column). Edit freely.
+  quiz: [
+    "How do you think Jesse & Francesca met?",
+    'Who said "I love you" first — Jesse or Francesca?',
+    "Describe the couple in three words.",
+    "What's your favorite memory with us — or a wish for our future?",
+    "Any advice (or a hot tip) for a long, happy marriage?",
+  ],
 };
 
 export const nav = {

@@ -22,7 +22,7 @@ function findParty(name: string): { members: string[] } | null {
   );
 }
 
-type Step = "search" | "respond" | "done";
+type Step = "quiz" | "search" | "respond" | "done";
 
 export default function RsvpModal({
   open,
@@ -31,18 +31,20 @@ export default function RsvpModal({
   open: boolean;
   onClose: () => void;
 }) {
-  const [step, setStep] = useState<Step>("search");
+  const [step, setStep] = useState<Step>("quiz");
   const [query, setQuery] = useState("");
   const [party, setParty] = useState<{ members: string[] } | null>(null);
   const [answers, setAnswers] = useState<Record<string, "yes" | "no">>({});
+  const [quiz, setQuiz] = useState<string[]>(() => rsvp.quiz.map(() => ""));
   const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
 
   function reset() {
-    setStep("search");
+    setStep("quiz");
     setQuery("");
     setParty(null);
     setAnswers({});
+    setQuiz(rsvp.quiz.map(() => ""));
     setError(null);
   }
 
@@ -84,6 +86,11 @@ export default function RsvpModal({
     const song = (fd.get("song") as string) || "";
     const message = (fd.get("message") as string) || "";
     const submittedAt = new Date().toISOString();
+    // Combine the optional quiz answers into one readable "Trivia" field.
+    const trivia = rsvp.quiz
+      .map((q, i) => (quiz[i]?.trim() ? `${q} — ${quiz[i].trim()}` : null))
+      .filter(Boolean)
+      .join("\n");
 
     if (rsvp.endpoint) {
       try {
@@ -103,6 +110,7 @@ export default function RsvpModal({
               dietary,
               song,
               message,
+              trivia,
             }),
           });
         }
@@ -147,7 +155,59 @@ export default function RsvpModal({
             </button>
 
             <p className="text-xs uppercase tracking-[0.3em] text-rust">{couple.monogram}</p>
-            <h2 className="display mt-1 text-5xl text-ink">rsvp</h2>
+            <h2 className="display mt-1 text-5xl text-ink">
+              {step === "quiz" ? "a little quiz" : "rsvp"}
+            </h2>
+
+            {/* STEP 0 — optional trivia */}
+            {step === "quiz" && (
+              <div className="mt-4">
+                <p className="text-sm text-stone">
+                  Optional, but we&apos;d love it — a quick &ldquo;how well do you know us&rdquo;
+                  before you RSVP. No wrong answers!
+                </p>
+                <div className="mt-4 max-h-[50vh] space-y-4 overflow-y-auto pr-1">
+                  {rsvp.quiz.map((q, i) => (
+                    <div key={i}>
+                      <label className="mb-1.5 block text-sm font-medium text-ink">
+                        {i + 1}. {q}
+                      </label>
+                      <textarea
+                        value={quiz[i] ?? ""}
+                        onChange={(e) =>
+                          setQuiz((prev) => {
+                            const next = [...prev];
+                            next[i] = e.target.value;
+                            return next;
+                          })
+                        }
+                        rows={2}
+                        className="w-full rounded-lg border border-ink/15 bg-white/60 px-3 py-2 text-sm text-ink outline-none focus:border-rust"
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-5 flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setStep("search")}
+                    className="flex-1 rounded-full bg-rust px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-rust-dark"
+                  >
+                    Continue to RSVP →
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setQuiz(rsvp.quiz.map(() => ""));
+                      setStep("search");
+                    }}
+                    className="text-sm text-stone underline underline-offset-4 transition-colors hover:text-ink"
+                  >
+                    Skip
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* STEP 1 — find your invitation */}
             {step === "search" && (
