@@ -1,36 +1,39 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { couple, rsvp } from "@/content/wedding";
 import Burst from "./Burst";
 
 // A household from the guest sheet: a main invitee + an optional plus-one.
-// plus === ""      -> no plus-one (solo)
-// plus === "Guest" -> an un-named plus-one the guest fills in
-// plus === "<name>"-> a named plus-one
-type Household = { name: string; plus: string };
+//   plus === ""      -> no plus-one (solo)
+//   plus === "Guest" -> an un-named plus-one; the guest types the name (stored
+//                       in `guestName`, written back to the sheet's 3rd column)
+//   plus === "<name>"-> a named plus-one (fixed)
+type Household = { name: string; plus: string; guestName: string };
 
 const norm = (s: string) => s.trim().toLowerCase().replace(/\s+/g, " ");
-const looseMatch = (a: string, b: string) => {
-  const x = norm(a), y = norm(b);
-  return !!x && !!y && (x === y || x.includes(y) || y.includes(x));
-};
+const isGuest = (plus: string) => norm(plus) === "guest";
 
-/** Find a household by a typed name — matches the Name OR a named Plus-one. */
-function findHousehold(list: Household[], q: string): Household | null {
-  if (!norm(q)) return null;
-  if (!list.length) return { name: q.trim(), plus: "" }; // open RSVP (no sheet)
+/** Does a household match a typed query? Matches Name, a named Plus-one, or a typed guest. */
+function matches(h: Household, q: string): boolean {
+  const n = norm(q);
+  if (!n) return false;
   return (
-    list.find(
-      (h) =>
-        looseMatch(h.name, q) ||
-        (h.plus && norm(h.plus) !== "guest" && looseMatch(h.plus, q))
-    ) ?? null
+    norm(h.name).includes(n) ||
+    (!!h.plus && !isGuest(h.plus) && norm(h.plus).includes(n)) ||
+    (!!h.guestName && norm(h.guestName).includes(n))
   );
 }
 
-/** Pull the live guest list (Name | Plus one) from the public Google Sheet. */
+/** How a household reads in the search list — shows both names so duplicates differ. */
+function householdLabel(h: Household): string {
+  if (!h.plus) return h.name;
+  if (isGuest(h.plus)) return h.guestName ? `${h.name} & ${h.guestName}` : `${h.name}  ·  +1 guest`;
+  return `${h.name} & ${h.plus}`;
+}
+
+/** Pull the live guest list (Name | Plus one | Guest name) from the public Google Sheet. */
 async function fetchHouseholds(): Promise<Household[]> {
   const { id, tab } = rsvp.guestSheet;
   if (!id) return [];
@@ -40,11 +43,10 @@ async function fetchHouseholds(): Promise<Household[]> {
   const text = await (await fetch(url)).text();
   const json = JSON.parse(text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1));
   const rows: { c: ({ v: unknown } | null)[] }[] = json.table?.rows ?? [];
+  const cell = (row: { c: ({ v: unknown } | null)[] }, i: number) =>
+    row.c?.[i]?.v != null ? String(row.c[i]!.v).trim() : "";
   return rows
-    .map((row) => ({
-      name: row.c?.[0]?.v != null ? String(row.c[0]!.v).trim() : "",
-      plus: row.c?.[1]?.v != null ? String(row.c[1]!.v).trim() : "",
-    }))
+    .map((row) => ({ name: cell(row, 0), plus: cell(row, 1), guestName: cell(row, 2) }))
     // Keep real guests only; drop a stray header row if gviz includes it.
     .filter((h) => h.name && norm(h.name) !== "name");
 }
@@ -80,8 +82,13 @@ export default function RsvpModal({ open, onClose }: { open: boolean; onClose: (
     };
   }, [open]);
 
+  const results = useMemo(() => {
+    if (query.trim().length < 2) return [];
+    return households.filter((h) => matches(h, query)).slice(0, 8);
+  }, [households, query]);
+
   const hasPlus = !!household && household.plus !== "";
-  const isGuestSlot = !!household && norm(household.plus) === "guest";
+  const guestSlot = !!household && isGuest(household.plus);
 
   function reset() {
     setStep("quiz");
@@ -99,22 +106,25 @@ export default function RsvpModal({ open, onClose }: { open: boolean; onClose: (
     window.setTimeout(reset, 350);
   }
 
+  function selectHousehold(h: Household) {
+    setHousehold(h);
+    setMainStatus(null);
+    setPlusStatus(null);
+    setPlusName(isGuest(h.plus) ? h.guestName : ""); // pre-fill a previously-typed guest
+    setError(null);
+    setStep("respond");
+  }
+
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    const found = findHousehold(households, query);
-    if (!found) {
-      setError(
-        "We couldn't find that name on the guest list. Please enter it as it appears on your invitation, or reach out to us."
-      );
+    // No live list (sheet empty/unreachable) -> open RSVP with the typed name.
+    if (!households.length) {
+      if (!query.trim()) return;
+      selectHousehold({ name: query.trim(), plus: "", guestName: "" });
       return;
     }
-    setHousehold(found);
-    setMainStatus(null);
-    setPlusStatus(null);
-    // Pre-fill a named plus-one (so they can update it); blank for a "Guest" slot.
-    setPlusName(norm(found.plus) === "guest" ? "" : found.plus);
-    setStep("respond");
+    if (results.length) selectHousehold(results[0]); // Enter picks the top match
   }
 
   const attendingCount =
@@ -133,7 +143,7 @@ export default function RsvpModal({ open, onClose }: { open: boolean; onClose: (
       setError("Please respond for your plus-one (or you can decline for them).");
       return;
     }
-    if (hasPlus && plusStatus === "yes" && !plusName.trim()) {
+    if (guestSlot && plusStatus === "yes" && !plusName.trim()) {
       setError("Please add your guest's name, or decline the plus-one.");
       return;
     }
@@ -146,12 +156,10 @@ export default function RsvpModal({ open, onClose }: { open: boolean; onClose: (
     const quizQuestions = rsvp.quiz.map((item) => item.q);
     const quizAns = rsvp.quiz.map((_, i) => (quiz[i] ? quiz[i].trim() : ""));
 
+    const plusDisplay = guestSlot ? plusName.trim() || "Guest" : household.plus;
     const guests = [{ name: household.name, attending: mainStatus === "yes" ? "Yes" : "No" }];
     if (hasPlus) {
-      guests.push({
-        name: plusName.trim() || "Guest",
-        attending: plusStatus === "yes" ? "Yes" : "No",
-      });
+      guests.push({ name: plusDisplay, attending: plusStatus === "yes" ? "Yes" : "No" });
     }
 
     if (rsvp.endpoint) {
@@ -173,8 +181,9 @@ export default function RsvpModal({ open, onClose }: { open: boolean; onClose: (
             answers: quizAns,
           }),
         });
-        // If they named/changed their plus-one, save it back to the guest sheet.
-        if (hasPlus && plusName.trim() && norm(plusName) !== norm(household.plus)) {
+        // For a "Guest" slot, save the typed name back to the sheet (column C) so
+        // it's remembered and can be updated on a return visit.
+        if (guestSlot && plusName.trim() && norm(plusName) !== norm(household.guestName)) {
           await fetch(rsvp.endpoint, {
             method: "POST",
             mode: "no-cors",
@@ -302,28 +311,51 @@ export default function RsvpModal({ open, onClose }: { open: boolean; onClose: (
               </div>
             )}
 
-            {/* STEP 1 — find your invitation */}
+            {/* STEP 1 — find your invitation (live type-ahead) */}
             {step === "search" && (
               <form onSubmit={handleSearch} className="mt-4">
                 <p className="text-sm text-stone">
-                  Enter your name as it appears on your invitation to find your RSVP.
+                  Start typing your name, then pick your invitation from the list.
                 </p>
                 <input
                   autoFocus
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="First and last name"
+                  placeholder="Your name"
                   className="mt-4 w-full rounded-lg border border-ink/15 bg-white/60 px-3 py-2.5 text-sm text-ink outline-none focus:border-rust"
                 />
+
+                {households.length > 0 ? (
+                  <div className="mt-3 space-y-2">
+                    {results.map((h, i) => (
+                      <button
+                        key={`${h.name}-${i}`}
+                        type="button"
+                        onClick={() => selectHousehold(h)}
+                        className="flex w-full items-center justify-between rounded-lg border border-ink/15 bg-white/60 px-4 py-3 text-left text-sm text-ink transition-colors hover:border-rust hover:bg-rust/5"
+                      >
+                        <span className="font-serif">{householdLabel(h)}</span>
+                        <span className="text-rust">→</span>
+                      </button>
+                    ))}
+                    {query.trim().length >= 2 && results.length === 0 && (
+                      <p className="rounded-lg bg-rust/10 px-3 py-2 text-sm text-rust-dark">
+                        We couldn&apos;t find that name. Try the name on your invitation, or reach
+                        out to us.
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <button
+                    type="submit"
+                    className="mt-5 w-full rounded-full bg-rust px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-rust-dark"
+                  >
+                    Continue
+                  </button>
+                )}
                 {error && (
                   <p className="mt-3 rounded-lg bg-rust/10 px-3 py-2 text-sm text-rust-dark">{error}</p>
                 )}
-                <button
-                  type="submit"
-                  className="mt-5 w-full rounded-full bg-rust px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-rust-dark"
-                >
-                  Find my invitation
-                </button>
               </form>
             )}
 
@@ -333,23 +365,24 @@ export default function RsvpModal({ open, onClose }: { open: boolean; onClose: (
                 <p className="text-sm text-stone">Please let us know if you can make it.</p>
 
                 <div className="mt-4 space-y-3">
-                  {/* main invitee */}
-                  <GuestCard
-                    title={household.name}
-                    status={mainStatus}
-                    onPick={setMainStatus}
-                  />
+                  {/* main invitee — always a fixed name */}
+                  <GuestCard title={household.name} status={mainStatus} onPick={setMainStatus} />
 
-                  {/* plus-one (named or "Guest") */}
-                  {hasPlus && (
+                  {/* named plus-one — also fixed */}
+                  {hasPlus && !guestSlot && (
+                    <GuestCard title={household.plus} status={plusStatus} onPick={setPlusStatus} />
+                  )}
+
+                  {/* "Guest" plus-one — type the name */}
+                  {guestSlot && (
                     <div className="rounded-xl border border-ink/10 bg-white/50 p-3">
                       <label className="mb-1.5 block text-xs uppercase tracking-wide text-stone">
-                        {isGuestSlot ? "Your plus-one" : "Plus-one (edit to update)"}
+                        Your plus-one
                       </label>
                       <input
                         value={plusName}
                         onChange={(e) => setPlusName(e.target.value)}
-                        placeholder="Plus-one's name"
+                        placeholder="Your guest's name"
                         className="mb-2 w-full rounded-lg border border-ink/15 bg-white/70 px-3 py-2 text-sm text-ink outline-none focus:border-rust"
                       />
                       <div className="flex gap-2">

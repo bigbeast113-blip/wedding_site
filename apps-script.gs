@@ -63,17 +63,21 @@ function doPost(e) {
   }
 }
 
-/** Find the row whose Name (col A) matches and set its Plus one (col B). */
-function updatePlusOne(name, plusOne) {
+/**
+ * Save the typed "Guest" name for an invitee. Writes to column C ("Guest name")
+ * and leaves column B as "Guest", so the slot stays editable on a return visit.
+ */
+function updatePlusOne(name, guestName) {
   if (!name) return;
   var gss = SpreadsheetApp.openById(GUEST_SHEET_ID);
   var sh = (GUEST_TAB && gss.getSheetByName(GUEST_TAB)) || gss.getSheets()[0];
   if (!sh) return;
+  if (!sh.getRange(1, 3).getValue()) sh.getRange(1, 3).setValue('Guest name'); // ensure header
   var data = sh.getDataRange().getValues(); // includes the header row
   var target = String(name).trim().toLowerCase();
   for (var r = 1; r < data.length; r++) {   // r=1 skips the header
     if (String(data[r][0]).trim().toLowerCase() === target) {
-      sh.getRange(r + 1, 2).setValue(plusOne); // column 2 = "Plus one"
+      sh.getRange(r + 1, 3).setValue(guestName); // column 3 = "Guest name"
       return;
     }
   }
