@@ -88,7 +88,7 @@ export default function RsvpModal({
     const submittedAt = new Date().toISOString();
     // Combine the optional quiz answers into one readable "Trivia" field.
     const trivia = rsvp.quiz
-      .map((q, i) => (quiz[i]?.trim() ? `${q} — ${quiz[i].trim()}` : null))
+      .map((item, i) => (quiz[i]?.trim() ? `${item.q} — ${quiz[i].trim()}` : null))
       .filter(Boolean)
       .join("\n");
 
@@ -167,23 +167,48 @@ export default function RsvpModal({
                   before you RSVP. No wrong answers!
                 </p>
                 <div className="mt-4 max-h-[50vh] space-y-4 overflow-y-auto pr-1">
-                  {rsvp.quiz.map((q, i) => (
+                  {rsvp.quiz.map((item, i) => (
                     <div key={i}>
                       <label className="mb-1.5 block text-sm font-medium text-ink">
-                        {i + 1}. {q}
+                        {i + 1}. {item.q}
                       </label>
-                      <textarea
-                        value={quiz[i] ?? ""}
-                        onChange={(e) =>
-                          setQuiz((prev) => {
-                            const next = [...prev];
-                            next[i] = e.target.value;
-                            return next;
-                          })
-                        }
-                        rows={2}
-                        className="w-full rounded-lg border border-ink/15 bg-white/60 px-3 py-2 text-sm text-ink outline-none focus:border-rust"
-                      />
+                      {item.options ? (
+                        <div className="flex flex-wrap gap-2">
+                          {item.options.map((opt) => (
+                            <button
+                              key={opt}
+                              type="button"
+                              onClick={() =>
+                                setQuiz((prev) => {
+                                  const next = [...prev];
+                                  next[i] = next[i] === opt ? "" : opt;
+                                  return next;
+                                })
+                              }
+                              className={`rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
+                                quiz[i] === opt
+                                  ? "border-rust bg-rust text-white"
+                                  : "border-ink/15 text-stone hover:border-rust"
+                              }`}
+                            >
+                              {opt}
+                            </button>
+                          ))}
+                        </div>
+                      ) : (
+                        <textarea
+                          value={quiz[i] ?? ""}
+                          onChange={(e) =>
+                            setQuiz((prev) => {
+                              const next = [...prev];
+                              next[i] = e.target.value;
+                              return next;
+                            })
+                          }
+                          rows={2}
+                          className="w-full rounded-lg border border-ink/15 bg-white/60 px-3 py-2 text-sm text-ink outline-none focus:border-rust"
+                        />
+                      )}
                     </div>
                   ))}
                 </div>

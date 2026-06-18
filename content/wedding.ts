@@ -378,18 +378,20 @@ export const rsvp = {
   //   { members: ["Jesse Abruzzo", "Francesca Primiani"] },
   //   { members: ["Roger Smith", "Jane Smith", "Smith Family +2"] },
   parties: [] as { members: string[] }[],
-  // Optional "how well do you know us" quiz shown before the RSVP. Free-text
-  // answers are saved to the Google Sheet (one "Trivia" column). Edit freely.
+  // Optional "how well do you know us" quiz shown before the RSVP. Answers are
+  // saved to the Google Sheet (one "Trivia" column). Give a question `options`
+  // to make it multiple-choice; otherwise it's a free-text field. Edit freely.
   quiz: [
-    "How do you think Jesse & Francesca met?",
-    'Who said "I love you" first — Jesse or Francesca?',
-    "Describe the couple in three words.",
-    "What's your favorite memory with us — or a wish for our future?",
-    "Any advice (or a hot tip) for a long, happy marriage?",
-    "Team Daisy or Team Duke? 🐾",
-    "Who do you think will cry first at the ceremony?",
-    "Where do you think we should honeymoon?",
-  ],
+    { q: 'Do you know where the nickname "Tutti" came from?' },
+    { q: "How old are Duke and Daisy?" },
+    { q: "What's our favorite coffee shop?" },
+    {
+      q: "Which of these has Tutti NOT baked?",
+      options: ["Chocolate chip cookies", "Cinnamon rolls", "CrinkleTop cake", "Scones"],
+    },
+    { q: "What's our favorite food to order in?" },
+    { q: "Any advice for a long, happy marriage?" },
+  ] as { q: string; options?: string[] }[],
 };
 
 export const nav = {
