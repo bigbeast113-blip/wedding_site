@@ -356,14 +356,18 @@ export const rsvp = {
   //   { members: ["Roger Smith", "Jane Smith", "Smith Family +2"] },
   parties: [] as { members: string[] }[],
   // OR — pull the guest list LIVE from a Google Sheet so you can edit it anytime
-  // without redeploying. Make a SEPARATE sheet (names only), share it
-  // "Anyone with the link → Viewer", and paste its ID + tab name below. Layout:
-  // one household PER ROW, each guest's name in its own cell (A, B, C…), with a
-  // header row (e.g. "Guest 1 | Guest 2 | Guest 3"). Leave id "" to use `parties`
-  // above (or open RSVP if that's empty too).
+  // without redeploying. Make a SEPARATE sheet, share it "Anyone with the link →
+  // Viewer", and paste its ID + tab name below. Layout = TWO columns with a header
+  // row:  Name | Plus one
+  //   • blank "Plus one"  -> that person RSVPs solo (no plus-one)
+  //   • a name in "Plus one" -> they get that named plus-one
+  //   • the word "Guest"  -> they get a plus-one and type the name themselves
+  // A guest can search EITHER column; we auto-fill the rest of the household. If
+  // they fill in / change a "Guest" name, it's saved back to this sheet (via the
+  // Apps Script) so they can return and update it. Leave id "" for open RSVP.
   guestSheet: {
     id: "",
-    tab: "Guests",
+    tab: "weddingguestlist",
   },
   // Optional "how well do you know us" quiz shown before the RSVP. Answers are
   // saved to the Google Sheet (one "Trivia" column). Give a question `options`

@@ -5,26 +5,33 @@ import { motion, AnimatePresence } from "framer-motion";
 import { couple, rsvp } from "@/content/wedding";
 import Burst from "./Burst";
 
-type Party = { members: string[] };
-const norm = (s: string) => s.trim().toLowerCase().replace(/\s+/g, " ");
+// A household from the guest sheet: a main invitee + an optional plus-one.
+// plus === ""      -> no plus-one (solo)
+// plus === "Guest" -> an un-named plus-one the guest fills in
+// plus === "<name>"-> a named plus-one
+type Household = { name: string; plus: string };
 
-/** Find the party (household) a typed name belongs to. */
-function findParty(parties: Party[], name: string): Party | null {
-  const n = norm(name);
-  if (!n) return null;
-  if (!parties.length) return { members: [name.trim()] }; // open RSVP
+const norm = (s: string) => s.trim().toLowerCase().replace(/\s+/g, " ");
+const looseMatch = (a: string, b: string) => {
+  const x = norm(a), y = norm(b);
+  return !!x && !!y && (x === y || x.includes(y) || y.includes(x));
+};
+
+/** Find a household by a typed name — matches the Name OR a named Plus-one. */
+function findHousehold(list: Household[], q: string): Household | null {
+  if (!norm(q)) return null;
+  if (!list.length) return { name: q.trim(), plus: "" }; // open RSVP (no sheet)
   return (
-    parties.find((p) =>
-      p.members.some((m) => {
-        const mn = norm(m);
-        return mn === n || mn.includes(n) || n.includes(mn);
-      })
+    list.find(
+      (h) =>
+        looseMatch(h.name, q) ||
+        (h.plus && norm(h.plus) !== "guest" && looseMatch(h.plus, q))
     ) ?? null
   );
 }
 
-/** Pull the guest list live from a public Google Sheet (gviz JSON feed). */
-async function fetchGuestSheet(): Promise<Party[]> {
+/** Pull the live guest list (Name | Plus one) from the public Google Sheet. */
+async function fetchHouseholds(): Promise<Household[]> {
   const { id, tab } = rsvp.guestSheet;
   if (!id) return [];
   const url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json${
@@ -35,87 +42,102 @@ async function fetchGuestSheet(): Promise<Party[]> {
   const rows: { c: ({ v: unknown } | null)[] }[] = json.table?.rows ?? [];
   return rows
     .map((row) => ({
-      members: (row.c ?? [])
-        .map((cell) => (cell && cell.v != null ? String(cell.v).trim() : ""))
-        .filter(Boolean),
+      name: row.c?.[0]?.v != null ? String(row.c[0]!.v).trim() : "",
+      plus: row.c?.[1]?.v != null ? String(row.c[1]!.v).trim() : "",
     }))
-    .filter((p) => p.members.length > 0);
+    .filter((h) => h.name);
 }
 
 type Step = "quiz" | "search" | "respond" | "done";
+type YesNo = "yes" | "no" | null;
 
-export default function RsvpModal({
-  open,
-  onClose,
-}: {
-  open: boolean;
-  onClose: () => void;
-}) {
+export default function RsvpModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [step, setStep] = useState<Step>("quiz");
   const [query, setQuery] = useState("");
-  const [parties, setParties] = useState<Party[]>(rsvp.parties);
-  const [party, setParty] = useState<{ members: string[] } | null>(null);
+  const [households, setHouseholds] = useState<Household[]>([]);
+  const [household, setHousehold] = useState<Household | null>(null);
 
-  // Load the live guest list from the Google Sheet when the modal opens.
+  const [mainStatus, setMainStatus] = useState<YesNo>(null);
+  const [plusStatus, setPlusStatus] = useState<YesNo>(null);
+  const [plusName, setPlusName] = useState("");
+
+  const [quiz, setQuiz] = useState<string[]>(() => rsvp.quiz.map(() => ""));
+  const [error, setError] = useState<string | null>(null);
+  const [sending, setSending] = useState(false);
+
+  // Load the live guest list when the modal opens.
   useEffect(() => {
     if (!open || !rsvp.guestSheet.id) return;
     let cancelled = false;
-    fetchGuestSheet()
+    fetchHouseholds()
       .then((list) => {
-        if (!cancelled && list.length) setParties(list);
+        if (!cancelled && list.length) setHouseholds(list);
       })
       .catch(() => {});
     return () => {
       cancelled = true;
     };
   }, [open]);
-  const [answers, setAnswers] = useState<Record<string, "yes" | "no">>({});
-  const [quiz, setQuiz] = useState<string[]>(() => rsvp.quiz.map(() => ""));
-  const [error, setError] = useState<string | null>(null);
-  const [sending, setSending] = useState(false);
+
+  const hasPlus = !!household && household.plus !== "";
+  const isGuestSlot = !!household && norm(household.plus) === "guest";
 
   function reset() {
     setStep("quiz");
     setQuery("");
-    setParty(null);
-    setAnswers({});
+    setHousehold(null);
+    setMainStatus(null);
+    setPlusStatus(null);
+    setPlusName("");
     setQuiz(rsvp.quiz.map(() => ""));
     setError(null);
   }
 
   function handleClose() {
     onClose();
-    // reset after the close animation
     window.setTimeout(reset, 350);
   }
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    const found = findParty(parties, query);
+    const found = findHousehold(households, query);
     if (!found) {
       setError(
         "We couldn't find that name on the guest list. Please enter it as it appears on your invitation, or reach out to us."
       );
       return;
     }
-    setParty(found);
-    setAnswers({});
+    setHousehold(found);
+    setMainStatus(null);
+    setPlusStatus(null);
+    // Pre-fill a named plus-one (so they can update it); blank for a "Guest" slot.
+    setPlusName(norm(found.plus) === "guest" ? "" : found.plus);
     setStep("respond");
   }
 
+  const attendingCount =
+    (mainStatus === "yes" ? 1 : 0) + (hasPlus && plusStatus === "yes" ? 1 : 0);
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!party) return;
+    if (!household) return;
     setError(null);
 
-    if (party.members.some((m) => !answers[m])) {
+    if (!mainStatus) {
       setError("Please choose a response for each guest.");
       return;
     }
+    if (hasPlus && !plusStatus) {
+      setError("Please respond for your plus-one (or you can decline for them).");
+      return;
+    }
+    if (hasPlus && plusStatus === "yes" && !plusName.trim()) {
+      setError("Please add your guest's name, or decline the plus-one.");
+      return;
+    }
 
-    const form = e.currentTarget;
-    const fd = new FormData(form);
+    const fd = new FormData(e.currentTarget);
     const email = (fd.get("email") as string) || "";
     const dietary = (fd.get("dietary") as string) || "";
     const message = (fd.get("message") as string) || "";
@@ -123,28 +145,46 @@ export default function RsvpModal({
     const quizQuestions = rsvp.quiz.map((item) => item.q);
     const quizAns = rsvp.quiz.map((_, i) => (quiz[i] ? quiz[i].trim() : ""));
 
+    const guests = [{ name: household.name, attending: mainStatus === "yes" ? "Yes" : "No" }];
+    if (hasPlus) {
+      guests.push({
+        name: plusName.trim() || "Guest",
+        attending: plusStatus === "yes" ? "Yes" : "No",
+      });
+    }
+
     if (rsvp.endpoint) {
       try {
         setSending(true);
-        // Everything in one request; the Apps Script splits it across tabs.
+        // RSVP + quiz in one request (the script splits into RSVPs / Trivia tabs).
         await fetch(rsvp.endpoint, {
           method: "POST",
           mode: "no-cors",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify({
             submittedAt,
-            partyName: party.members.join(" & "),
+            partyName: guests.map((g) => g.name).join(" & "),
             email,
             dietary,
             message,
-            guests: party.members.map((name) => ({
-              name,
-              attending: answers[name] === "yes" ? "Yes" : "No",
-            })),
+            guests,
             questions: quizQuestions,
             answers: quizAns,
           }),
         });
+        // If they named/changed their plus-one, save it back to the guest sheet.
+        if (hasPlus && plusName.trim() && norm(plusName) !== norm(household.plus)) {
+          await fetch(rsvp.endpoint, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+              kind: "plusone",
+              name: household.name,
+              plusOne: plusName.trim(),
+            }),
+          });
+        }
       } catch {
         /* fire-and-forget */
       } finally {
@@ -154,10 +194,6 @@ export default function RsvpModal({
 
     setStep("done");
   }
-
-  const attendingCount = party
-    ? party.members.filter((m) => answers[m] === "yes").length
-    : 0;
 
   return (
     <AnimatePresence>
@@ -269,7 +305,7 @@ export default function RsvpModal({
             {step === "search" && (
               <form onSubmit={handleSearch} className="mt-4">
                 <p className="text-sm text-stone">
-                  Enter your full name as it appears on your invitation to find your party.
+                  Enter your name as it appears on your invitation to find your RSVP.
                 </p>
                 <input
                   autoFocus
@@ -279,9 +315,7 @@ export default function RsvpModal({
                   className="mt-4 w-full rounded-lg border border-ink/15 bg-white/60 px-3 py-2.5 text-sm text-ink outline-none focus:border-rust"
                 />
                 {error && (
-                  <p className="mt-3 rounded-lg bg-rust/10 px-3 py-2 text-sm text-rust-dark">
-                    {error}
-                  </p>
+                  <p className="mt-3 rounded-lg bg-rust/10 px-3 py-2 text-sm text-rust-dark">{error}</p>
                 )}
                 <button
                   type="submit"
@@ -292,28 +326,39 @@ export default function RsvpModal({
               </form>
             )}
 
-            {/* STEP 2 — respond for each member of the party */}
-            {step === "respond" && party && (
+            {/* STEP 2 — respond */}
+            {step === "respond" && household && (
               <form onSubmit={handleSubmit} className="mt-4">
-                <p className="text-sm text-stone">
-                  We found your party. Please respond for each guest.
-                </p>
+                <p className="text-sm text-stone">Please let us know if you can make it.</p>
 
                 <div className="mt-4 space-y-3">
-                  {party.members.map((name) => (
-                    <div
-                      key={name}
-                      className="rounded-xl border border-ink/10 bg-white/50 p-3"
-                    >
-                      <p className="font-serif text-lg text-ink">{name}</p>
-                      <div className="mt-2 flex gap-2">
+                  {/* main invitee */}
+                  <GuestCard
+                    title={household.name}
+                    status={mainStatus}
+                    onPick={setMainStatus}
+                  />
+
+                  {/* plus-one (named or "Guest") */}
+                  {hasPlus && (
+                    <div className="rounded-xl border border-ink/10 bg-white/50 p-3">
+                      <label className="mb-1.5 block text-xs uppercase tracking-wide text-stone">
+                        {isGuestSlot ? "Your plus-one" : "Plus-one (edit to update)"}
+                      </label>
+                      <input
+                        value={plusName}
+                        onChange={(e) => setPlusName(e.target.value)}
+                        placeholder="Plus-one's name"
+                        className="mb-2 w-full rounded-lg border border-ink/15 bg-white/70 px-3 py-2 text-sm text-ink outline-none focus:border-rust"
+                      />
+                      <div className="flex gap-2">
                         {(["yes", "no"] as const).map((opt) => (
                           <button
                             key={opt}
                             type="button"
-                            onClick={() => setAnswers((a) => ({ ...a, [name]: opt }))}
+                            onClick={() => setPlusStatus(opt)}
                             className={`flex-1 rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
-                              answers[name] === opt
+                              plusStatus === opt
                                 ? "border-rust bg-rust text-white"
                                 : "border-ink/15 text-stone hover:border-rust"
                             }`}
@@ -323,7 +368,7 @@ export default function RsvpModal({
                         ))}
                       </div>
                     </div>
-                  ))}
+                  )}
                 </div>
 
                 <div className="mt-5 space-y-4">
@@ -344,9 +389,7 @@ export default function RsvpModal({
                 </div>
 
                 {error && (
-                  <p className="mt-3 rounded-lg bg-rust/10 px-3 py-2 text-sm text-rust-dark">
-                    {error}
-                  </p>
+                  <p className="mt-3 rounded-lg bg-rust/10 px-3 py-2 text-sm text-rust-dark">{error}</p>
                 )}
 
                 <div className="mt-5 flex gap-3">
@@ -378,9 +421,7 @@ export default function RsvpModal({
                 <h3 className="display text-4xl text-ink">thank you</h3>
                 <p className="mt-4 text-stone">
                   {attendingCount > 0
-                    ? `We can't wait to celebrate with ${
-                        attendingCount === 1 ? "you" : "your party"
-                      }! Your response has been recorded.`
+                    ? `We can't wait to celebrate with ${attendingCount === 1 ? "you" : "you both"}! Your response has been recorded.`
                     : "Thank you for letting us know — you'll be missed!"}
                 </p>
                 <button
@@ -395,6 +436,38 @@ export default function RsvpModal({
         </motion.div>
       )}
     </AnimatePresence>
+  );
+}
+
+function GuestCard({
+  title,
+  status,
+  onPick,
+}: {
+  title: string;
+  status: YesNo;
+  onPick: (s: "yes" | "no") => void;
+}) {
+  return (
+    <div className="rounded-xl border border-ink/10 bg-white/50 p-3">
+      <p className="font-serif text-lg text-ink">{title}</p>
+      <div className="mt-2 flex gap-2">
+        {(["yes", "no"] as const).map((opt) => (
+          <button
+            key={opt}
+            type="button"
+            onClick={() => onPick(opt)}
+            className={`flex-1 rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
+              status === opt
+                ? "border-rust bg-rust text-white"
+                : "border-ink/15 text-stone hover:border-rust"
+            }`}
+          >
+            {opt === "yes" ? "Joyfully accepts" : "Regretfully declines"}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
 
