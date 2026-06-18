@@ -43,12 +43,12 @@ export default function EngagementPage() {
 
         <div className="mx-auto max-w-5xl text-center">
           <motion.h1
-            className="display text-6xl text-ink sm:text-7xl md:text-8xl"
+            className="display text-5xl text-ink sm:text-7xl md:text-8xl"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            engagement
+            engagement photos
           </motion.h1>
           <motion.p
             className="mx-auto mt-4 max-w-xl text-stone"

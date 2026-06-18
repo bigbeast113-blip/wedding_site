@@ -206,17 +206,6 @@ export const details = {
       },
     },
     {
-      id: "dress-code",
-      title: "Dress Code",
-      blurb: "Winter formal at the lodge.",
-      image:
-        "https://images.unsplash.com/photo-1492447166138-50c3889fccb1?auto=format&fit=crop&w=900&q=80",
-      modal: {
-        intro:
-          "Winter formal / black-tie optional. Think rich tones, velvets, and warm layers. The celebration is indoors at the lodge, with a chill in the mountain air on the way in.",
-      },
-    },
-    {
       id: "dinner-menu",
       title: "Dinner Menu",
       blurb: "A quick look at what we are serving.",
@@ -247,24 +236,12 @@ export const details = {
       },
     },
     {
-      id: "music",
-      title: "Music",
-      blurb: "Cocktail hour and dance party playlists.",
-      image:
-        "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?auto=format&fit=crop&w=900&q=80",
-      modal: {
-        intro:
-          "From mellow cocktail-hour tunes to a dance floor that does not quit. Got a song that has to be played? Let us know.",
-        links: [{ label: "Cocktail Hour Playlist", url: "#" }, { label: "Dance Party Playlist", url: "#" }],
-      },
-    },
-    {
       id: "gallery",
       title: "Engagement Photos",
-      blurb: "A peek from our engagement party.",
-      image: "/photos/SZ6_7201-3264.jpg",
+      blurb: "A peek from our engagement photos.",
+      image: "/photos/new/img_3486.webp",
       modal: {
-        intro: "A few of our favorite moments from the engagement party.",
+        intro: "A few of our favorite moments.",
         gallery,
       },
     },
@@ -378,6 +355,16 @@ export const rsvp = {
   //   { members: ["Jesse Abruzzo", "Francesca Primiani"] },
   //   { members: ["Roger Smith", "Jane Smith", "Smith Family +2"] },
   parties: [] as { members: string[] }[],
+  // OR — pull the guest list LIVE from a Google Sheet so you can edit it anytime
+  // without redeploying. Make a SEPARATE sheet (names only), share it
+  // "Anyone with the link → Viewer", and paste its ID + tab name below. Layout:
+  // one household PER ROW, each guest's name in its own cell (A, B, C…), with a
+  // header row (e.g. "Guest 1 | Guest 2 | Guest 3"). Leave id "" to use `parties`
+  // above (or open RSVP if that's empty too).
+  guestSheet: {
+    id: "",
+    tab: "Guests",
+  },
   // Optional "how well do you know us" quiz shown before the RSVP. Answers are
   // saved to the Google Sheet (one "Trivia" column). Give a question `options`
   // to make it multiple-choice; otherwise it's a free-text field. Edit freely.

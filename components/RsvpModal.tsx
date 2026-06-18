@@ -1,25 +1,45 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { couple, rsvp } from "@/content/wedding";
 import Burst from "./Burst";
 
+type Party = { members: string[] };
 const norm = (s: string) => s.trim().toLowerCase().replace(/\s+/g, " ");
 
 /** Find the party (household) a typed name belongs to. */
-function findParty(name: string): { members: string[] } | null {
+function findParty(parties: Party[], name: string): Party | null {
   const n = norm(name);
   if (!n) return null;
-  if (!rsvp.parties.length) return { members: [name.trim()] }; // open RSVP
+  if (!parties.length) return { members: [name.trim()] }; // open RSVP
   return (
-    rsvp.parties.find((p) =>
+    parties.find((p) =>
       p.members.some((m) => {
         const mn = norm(m);
         return mn === n || mn.includes(n) || n.includes(mn);
       })
     ) ?? null
   );
+}
+
+/** Pull the guest list live from a public Google Sheet (gviz JSON feed). */
+async function fetchGuestSheet(): Promise<Party[]> {
+  const { id, tab } = rsvp.guestSheet;
+  if (!id) return [];
+  const url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json${
+    tab ? `&sheet=${encodeURIComponent(tab)}` : ""
+  }`;
+  const text = await (await fetch(url)).text();
+  const json = JSON.parse(text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1));
+  const rows: { c: ({ v: unknown } | null)[] }[] = json.table?.rows ?? [];
+  return rows
+    .map((row) => ({
+      members: (row.c ?? [])
+        .map((cell) => (cell && cell.v != null ? String(cell.v).trim() : ""))
+        .filter(Boolean),
+    }))
+    .filter((p) => p.members.length > 0);
 }
 
 type Step = "quiz" | "search" | "respond" | "done";
@@ -33,7 +53,22 @@ export default function RsvpModal({
 }) {
   const [step, setStep] = useState<Step>("quiz");
   const [query, setQuery] = useState("");
+  const [parties, setParties] = useState<Party[]>(rsvp.parties);
   const [party, setParty] = useState<{ members: string[] } | null>(null);
+
+  // Load the live guest list from the Google Sheet when the modal opens.
+  useEffect(() => {
+    if (!open || !rsvp.guestSheet.id) return;
+    let cancelled = false;
+    fetchGuestSheet()
+      .then((list) => {
+        if (!cancelled && list.length) setParties(list);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [open]);
   const [answers, setAnswers] = useState<Record<string, "yes" | "no">>({});
   const [quiz, setQuiz] = useState<string[]>(() => rsvp.quiz.map(() => ""));
   const [error, setError] = useState<string | null>(null);
@@ -57,7 +92,7 @@ export default function RsvpModal({
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    const found = findParty(query);
+    const found = findParty(parties, query);
     if (!found) {
       setError(
         "We couldn't find that name on the guest list. Please enter it as it appears on your invitation, or reach out to us."
