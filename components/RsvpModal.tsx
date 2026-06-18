@@ -83,7 +83,6 @@ export default function RsvpModal({
     const fd = new FormData(form);
     const email = (fd.get("email") as string) || "";
     const dietary = (fd.get("dietary") as string) || "";
-    const song = (fd.get("song") as string) || "";
     const message = (fd.get("message") as string) || "";
     const submittedAt = new Date().toISOString();
     const quizQuestions = rsvp.quiz.map((item) => item.q);
@@ -102,7 +101,6 @@ export default function RsvpModal({
             partyName: party.members.join(" & "),
             email,
             dietary,
-            song,
             message,
             guests: party.members.map((name) => ({
               name,
@@ -296,10 +294,7 @@ export default function RsvpModal({
                 <div className="mt-5 space-y-4">
                   <Field label="Email" name="email" type="email" required />
                   {attendingCount > 0 && (
-                    <>
-                      <Field label="Dietary restrictions (optional)" name="dietary" />
-                      <Field label="Song request (optional)" name="song" />
-                    </>
+                    <Field label="Dietary restrictions (optional)" name="dietary" />
                   )}
                   <div>
                     <label className="mb-1.5 block text-sm text-ink">
