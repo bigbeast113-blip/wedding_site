@@ -86,22 +86,21 @@ export default function RsvpModal({
     const song = (fd.get("song") as string) || "";
     const message = (fd.get("message") as string) || "";
     const submittedAt = new Date().toISOString();
-    // Combine the optional quiz answers into one readable "Trivia" field.
-    const trivia = rsvp.quiz
-      .map((item, i) => (quiz[i]?.trim() ? `${item.q} — ${quiz[i].trim()}` : null))
-      .filter(Boolean)
-      .join("\n");
+    const quizQuestions = rsvp.quiz.map((item) => item.q);
+    const quizAns = rsvp.quiz.map((_, i) => (quiz[i] ? quiz[i].trim() : ""));
+    const hasTrivia = quizAns.some((a) => a);
 
     if (rsvp.endpoint) {
       try {
         setSending(true);
-        // One row per guest (matches the Google Sheet columns).
+        // One row per guest → "RSVPs" tab.
         for (const name of party.members) {
           await fetch(rsvp.endpoint, {
             method: "POST",
             mode: "no-cors",
             headers: { "Content-Type": "text/plain;charset=utf-8" },
             body: JSON.stringify({
+              kind: "rsvp",
               submittedAt,
               name,
               email,
@@ -110,7 +109,21 @@ export default function RsvpModal({
               dietary,
               song,
               message,
-              trivia,
+            }),
+          });
+        }
+        // One row for the quiz → separate "Trivia" tab (a column per question).
+        if (hasTrivia) {
+          await fetch(rsvp.endpoint, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+              kind: "trivia",
+              submittedAt,
+              name: party.members.join(" & "),
+              questions: quizQuestions,
+              answers: quizAns,
             }),
           });
         }
