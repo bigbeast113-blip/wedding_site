@@ -386,6 +386,9 @@ export const rsvp = {
     "Describe the couple in three words.",
     "What's your favorite memory with us — or a wish for our future?",
     "Any advice (or a hot tip) for a long, happy marriage?",
+    "Team Daisy or Team Duke? 🐾",
+    "Who do you think will cry first at the ceremony?",
+    "Where do you think we should honeymoon?",
   ],
 };
 
