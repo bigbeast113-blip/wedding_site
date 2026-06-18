@@ -16,6 +16,10 @@ _*.py
 *.output
 example.mp4
 
+# large source assets — only their optimized copies in /public are deployed
+/engagmentphotogallery
+/photos/newweddingimages
+
 # python caches
 __pycache__/
 *.pyc
