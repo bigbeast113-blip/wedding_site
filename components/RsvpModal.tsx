@@ -88,45 +88,30 @@ export default function RsvpModal({
     const submittedAt = new Date().toISOString();
     const quizQuestions = rsvp.quiz.map((item) => item.q);
     const quizAns = rsvp.quiz.map((_, i) => (quiz[i] ? quiz[i].trim() : ""));
-    const hasTrivia = quizAns.some((a) => a);
 
     if (rsvp.endpoint) {
       try {
         setSending(true);
-        // One row per guest → "RSVPs" tab.
-        for (const name of party.members) {
-          await fetch(rsvp.endpoint, {
-            method: "POST",
-            mode: "no-cors",
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify({
-              kind: "rsvp",
-              submittedAt,
+        // Everything in one request; the Apps Script splits it across tabs.
+        await fetch(rsvp.endpoint, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            submittedAt,
+            partyName: party.members.join(" & "),
+            email,
+            dietary,
+            song,
+            message,
+            guests: party.members.map((name) => ({
               name,
-              email,
               attending: answers[name] === "yes" ? "Yes" : "No",
-              guests: party.members.length,
-              dietary,
-              song,
-              message,
-            }),
-          });
-        }
-        // One row for the quiz → separate "Trivia" tab (a column per question).
-        if (hasTrivia) {
-          await fetch(rsvp.endpoint, {
-            method: "POST",
-            mode: "no-cors",
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify({
-              kind: "trivia",
-              submittedAt,
-              name: party.members.join(" & "),
-              questions: quizQuestions,
-              answers: quizAns,
-            }),
-          });
-        }
+            })),
+            questions: quizQuestions,
+            answers: quizAns,
+          }),
+        });
       } catch {
         /* fire-and-forget */
       } finally {
