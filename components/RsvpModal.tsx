@@ -34,7 +34,7 @@ function findHousehold(list: Household[], q: string): Household | null {
 async function fetchHouseholds(): Promise<Household[]> {
   const { id, tab } = rsvp.guestSheet;
   if (!id) return [];
-  const url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json${
+  const url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&headers=1${
     tab ? `&sheet=${encodeURIComponent(tab)}` : ""
   }`;
   const text = await (await fetch(url)).text();
@@ -45,7 +45,8 @@ async function fetchHouseholds(): Promise<Household[]> {
       name: row.c?.[0]?.v != null ? String(row.c[0]!.v).trim() : "",
       plus: row.c?.[1]?.v != null ? String(row.c[1]!.v).trim() : "",
     }))
-    .filter((h) => h.name);
+    // Keep real guests only; drop a stray header row if gviz includes it.
+    .filter((h) => h.name && norm(h.name) !== "name");
 }
 
 type Step = "quiz" | "search" | "respond" | "done";

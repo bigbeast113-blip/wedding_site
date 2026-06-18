@@ -14,8 +14,8 @@
 
 // ===== CONFIG =====
 var RSVP_SHEET_ID  = '1T1Cf13M3OFWh5L-jH6oBhCApqj0FGh8VxZDvuLRmzoM'; // RSVP responses — keep PRIVATE
-var GUEST_SHEET_ID = 'PASTE_WEDDINGGUESTLIST_SPREADSHEET_ID_HERE';    // Name | Plus one sheet (shared "Anyone with link → Viewer")
-var GUEST_TAB      = 'weddingguestlist';                              // the tab name inside that sheet
+var GUEST_SHEET_ID = '1w0DCumOOjYJoRWMWAlJQpZscgcYg7yemYdGlBLYq0wA'; // Name | Plus one sheet (shared "Anyone with link → Viewer")
+var GUEST_TAB      = '';                                             // '' = use the first tab (name doesn't matter)
 
 function doPost(e) {
   try {
@@ -66,7 +66,8 @@ function doPost(e) {
 /** Find the row whose Name (col A) matches and set its Plus one (col B). */
 function updatePlusOne(name, plusOne) {
   if (!name) return;
-  var sh = SpreadsheetApp.openById(GUEST_SHEET_ID).getSheetByName(GUEST_TAB);
+  var gss = SpreadsheetApp.openById(GUEST_SHEET_ID);
+  var sh = (GUEST_TAB && gss.getSheetByName(GUEST_TAB)) || gss.getSheets()[0];
   if (!sh) return;
   var data = sh.getDataRange().getValues(); // includes the header row
   var target = String(name).trim().toLowerCase();

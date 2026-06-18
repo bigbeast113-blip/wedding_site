@@ -366,8 +366,8 @@ export const rsvp = {
   // they fill in / change a "Guest" name, it's saved back to this sheet (via the
   // Apps Script) so they can return and update it. Leave id "" for open RSVP.
   guestSheet: {
-    id: "",
-    tab: "weddingguestlist",
+    id: "1w0DCumOOjYJoRWMWAlJQpZscgcYg7yemYdGlBLYq0wA",
+    tab: "", // "" = read the first tab (gid 0), so the tab name doesn't matter
   },
   // Optional "how well do you know us" quiz shown before the RSVP. Answers are
   // saved to the Google Sheet (one "Trivia" column). Give a question `options`
