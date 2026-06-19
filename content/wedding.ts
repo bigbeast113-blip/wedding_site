@@ -249,7 +249,7 @@ export const details = {
 };
 
 export const vision = {
-  text: "The vision for the night is simple: all of our most beloved people in one place, a cozy mountain lodge, flowing drinks, and an unforgettable dance floor. [Edit this to say it in your own words.]",
+  text: "The vision for the night is simple: all of our most beloved people in one place, a cozy mountain lodge, flowing drinks, and an unforgettable dance floor.",
 };
 
 export const faq = {
@@ -260,7 +260,7 @@ export const faq = {
   items: [
     {
       q: "When should I RSVP by?",
-      a: "Please RSVP by [DATE — e.g. November 1, 2026] using the Submit RSVP button at the top of the page.",
+      a: "Please RSVP by November 1st using the Submit RSVP button at the top of the page.",
     },
     {
       q: "Is there a dress code?",
@@ -302,8 +302,11 @@ export type PartyMember = { name: string; role?: string; image?: string };
 export const weddingParty = {
   heading: "the wedding party",
   intro: "The people standing beside us — our favorite humans, all in one place.",
-  // Add a photo per person by dropping a file in /public/photos/party/ and
-  // setting image: "/photos/party/brittany.jpg".
+  // PHOTOS: just drop a file named after the person (e.g. "Roger.jpg" or
+  // "Ian.png") into  photos/weddingparty/  and run  python _optimize_party.py
+  // — the site finds each avatar BY NAME automatically (no code change needed).
+  // Anyone without a photo shows their initials. (You can still hard-code a
+  // path with image: "/photos/weddingparty/whatever.webp" to override.)
   groups: [
     {
       title: "Bridesmaids",
@@ -333,6 +336,7 @@ export const weddingParty = {
         { name: "Vinny" },
         { name: "Greg" },
         { name: "Nick" },
+        { name: "Ian" },
       ] as PartyMember[],
     },
   ],

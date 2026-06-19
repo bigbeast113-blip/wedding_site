@@ -1,9 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { weddingParty, couple, decoTrees, PartyMember } from "@/content/wedding";
 import { usePageTransition } from "@/components/PageTransition";
 import DecoTree from "@/components/DecoTree";
+
+// Avatars are discovered by name: drop "<Name>.jpg/.png/.webp" into
+// public/photos/weddingparty/ (via _optimize_party.py) and it shows up.
+const PARTY_DIR = "/photos/weddingparty";
+const EXTS = ["webp", "jpg", "jpeg", "png"];
 
 function initials(name: string) {
   return name
@@ -15,6 +21,15 @@ function initials(name: string) {
 }
 
 function MemberCard({ m, i }: { m: PartyMember; i: number }) {
+  // Try an explicit override first, then the person's name with each extension;
+  // when all fail, fall back to initials.
+  const candidates = [
+    ...(m.image ? [m.image] : []),
+    ...EXTS.map((ext) => `${PARTY_DIR}/${encodeURIComponent(m.name)}.${ext}`),
+  ];
+  const [idx, setIdx] = useState(0);
+  const src = idx < candidates.length ? candidates[idx] : null;
+
   return (
     <motion.div
       className="flex flex-col items-center text-center"
@@ -24,8 +39,13 @@ function MemberCard({ m, i }: { m: PartyMember; i: number }) {
       transition={{ duration: 0.6, delay: (i % 6) * 0.06 }}
     >
       <div className="relative h-32 w-32 overflow-hidden rounded-full border border-white/70 shadow-lg ring-1 ring-black/5 sm:h-36 sm:w-36">
-        {m.image ? (
-          <img src={m.image} alt={m.name} className="h-full w-full object-cover" />
+        {src ? (
+          <img
+            src={src}
+            alt={m.name}
+            onError={() => setIdx((n) => n + 1)}
+            className="h-full w-full object-cover"
+          />
         ) : (
           <div
             className="flex h-full w-full items-center justify-center font-serif text-4xl text-stone"

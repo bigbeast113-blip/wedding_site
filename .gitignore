@@ -19,6 +19,7 @@ example.mp4
 # large source assets — only their optimized copies in /public are deployed
 /engagmentphotogallery
 /photos/newweddingimages
+/photos/weddingparty
 
 # python caches
 __pycache__/
