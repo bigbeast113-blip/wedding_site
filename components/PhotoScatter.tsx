@@ -18,25 +18,30 @@ function ScatterImg({
   src,
   i,
   progress,
-  scale,
+  dist,
+  size,
+  reach,
 }: {
   src: string;
   i: number;
   progress: MotionValue<number>;
-  scale: number;
+  dist: number;
+  size: number;
+  reach: number;
 }) {
   const pos = layout[i % layout.length];
   const openLightbox = useLightbox();
-  const x = useTransform(progress, [0, 1], ["0vw", `${pos.x * scale}vw`]);
-  const y = useTransform(progress, [0, 1], ["0vh", `${pos.y * scale}vh`]);
-  const rotate = useTransform(progress, [0, 1], [0, pos.r]);
+  // Finish the spread by `reach` (the section pins partway, so 1.0 never shows).
+  const x = useTransform(progress, [0, reach], ["0vw", `${pos.x * dist}vw`]);
+  const y = useTransform(progress, [0, reach], ["0vh", `${pos.y * dist}vh`]);
+  const rotate = useTransform(progress, [0, reach], [0, pos.r]);
   const opacity = useTransform(progress, [0, 0.25, 1], [0, 1, 1]);
 
   return (
     // Outer wrapper centers on the container (plain CSS); inner image scatters.
     <div
       className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-      style={{ width: pos.w * scale }}
+      style={{ width: pos.w * size }}
     >
       <motion.img
         src={src}
@@ -58,10 +63,16 @@ export default function PhotoScatter() {
 
   const cardScale = useTransform(scrollYProgress, [0, 0.5, 1], [0.9, 1, 0.96]);
 
-  // Pull the scattered photos in closer on small screens so they don't clip.
-  const [scale, setScale] = useState(1);
+  // On small screens, shrink the photos but push them OUT farther (and finish the
+  // spread sooner) so they clear the centered "together" card instead of hiding it.
+  const [dims, setDims] = useState({ dist: 1, size: 1, reach: 1 });
   useEffect(() => {
-    const f = () => setScale(window.innerWidth < 640 ? 0.6 : 1);
+    const f = () =>
+      setDims(
+        window.innerWidth < 640
+          ? { dist: 1.1, size: 0.5, reach: 0.6 }
+          : { dist: 1, size: 1, reach: 1 }
+      );
     f();
     window.addEventListener("resize", f);
     return () => window.removeEventListener("resize", f);
@@ -71,7 +82,15 @@ export default function PhotoScatter() {
     <section ref={ref} className="section-frost relative h-[180vh]">
       <div className="sticky top-0 flex h-screen items-center justify-center overflow-hidden">
         {scatterPhotos.map((src, i) => (
-          <ScatterImg key={i} src={src} i={i} progress={scrollYProgress} scale={scale} />
+          <ScatterImg
+            key={i}
+            src={src}
+            i={i}
+            progress={scrollYProgress}
+            dist={dims.dist}
+            size={dims.size}
+            reach={dims.reach}
+          />
         ))}
 
         <motion.div
