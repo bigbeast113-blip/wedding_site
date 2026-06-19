@@ -7,7 +7,7 @@
  * Copy the /exec URL into content/wedding.ts -> rsvp.endpoint.
  *
  * Handles three things from a single endpoint:
- *   1. RSVP submissions  -> "RSVPs" tab   (one row per guest)
+ *   1. RSVP submissions  -> "RSVPs" tab   (one row per party: primary + plus-one)
  *   2. Trivia answers    -> "Trivia" tab  (one row per submission)
  *   3. Plus-one updates  -> writes the typed guest name back onto the guest list
  */
@@ -27,24 +27,25 @@ function doPost(e) {
       return ok();
     }
 
-    // --- 1. RSVP (one row per guest) ---
+    // --- 1. RSVP (one row per party: primary guest + plus-one) ---
     var ss = SpreadsheetApp.openById(RSVP_SHEET_ID);
     var rsvp = ss.getSheetByName('RSVPs') || ss.insertSheet('RSVPs');
-    if (rsvp.getLastRow() === 0) {
-      rsvp.appendRow(['Timestamp', 'Party', 'Guest', 'Attending', 'Email', 'Dietary', 'Note']);
-    }
+    var HEADERS = ['Submitted At', 'Primary guest', 'Primary attending',
+                   'Plus-one', 'Plus-one attending', 'Email', 'Dietary', 'Note'];
+    setHeader(rsvp, HEADERS); // create or correct the header row so it never drifts
     var guests = d.guests || [];
-    for (var i = 0; i < guests.length; i++) {
-      rsvp.appendRow([
-        d.submittedAt || new Date(),
-        d.partyName || '',
-        guests[i].name || '',
-        guests[i].attending || '',
-        d.email || '',
-        d.dietary || '',
-        d.message || ''
-      ]);
-    }
+    var g0 = guests[0] || {};
+    var g1 = guests[1] || {};
+    rsvp.appendRow([
+      d.submittedAt || new Date(),
+      g0.name || '',
+      g0.attending || '',
+      g1.name || '',
+      g1.attending || '',
+      d.email || '',
+      d.dietary || '',
+      d.message || ''
+    ]);
 
     // --- 2. Trivia (only if they answered something) ---
     var answers = d.answers || [];
@@ -81,6 +82,17 @@ function updatePlusOne(name, guestName) {
       return;
     }
   }
+}
+
+/** Ensure row 1 of a sheet matches the expected headers (creates or corrects them). */
+function setHeader(sh, headers) {
+  if (sh.getLastRow() === 0) {
+    sh.getRange(1, 1, 1, headers.length).setValues([headers]);
+    return;
+  }
+  var firstRow = sh.getRange(1, 1, 1, headers.length).getValues()[0];
+  var matches = headers.every(function (h, i) { return String(firstRow[i]) === h; });
+  if (!matches) sh.getRange(1, 1, 1, headers.length).setValues([headers]);
 }
 
 function ok() {
