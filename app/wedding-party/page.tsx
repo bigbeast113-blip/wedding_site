@@ -4,12 +4,14 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { weddingParty, couple, decoTrees, PartyMember } from "@/content/wedding";
 import { usePageTransition } from "@/components/PageTransition";
+import { useLightbox } from "@/components/Lightbox";
 import DecoTree from "@/components/DecoTree";
 
-// Avatars are discovered by name: drop "<Name>.jpg/.png/.webp" into
-// public/photos/weddingparty/ (via _optimize_party.py) and it shows up.
+// Avatars are discovered by name (case-insensitive): drop "<Name>.jpg/.png/.webp"
+// into photos/weddingparty/, run _optimize_party.py, and it shows up.
 const PARTY_DIR = "/photos/weddingparty";
 const EXTS = ["webp", "jpg", "jpeg", "png"];
+const slug = (s: string) => s.trim().toLowerCase().replace(/\s+/g, "-");
 
 function initials(name: string) {
   return name
@@ -21,14 +23,20 @@ function initials(name: string) {
 }
 
 function MemberCard({ m, i }: { m: PartyMember; i: number }) {
-  // Try an explicit override first, then the person's name with each extension;
+  const openLightbox = useLightbox();
+  const base = slug(m.name);
+  // Try an explicit override first, then the lowercased name with each extension;
   // when all fail, fall back to initials.
   const candidates = [
     ...(m.image ? [m.image] : []),
-    ...EXTS.map((ext) => `${PARTY_DIR}/${encodeURIComponent(m.name)}.${ext}`),
+    ...EXTS.map((ext) => `${PARTY_DIR}/${base}.${ext}`),
   ];
   const [idx, setIdx] = useState(0);
   const src = idx < candidates.length ? candidates[idx] : null;
+
+  // Click opens the full (uncropped) photo: the generated "-full" webp when the
+  // avatar is our optimized one, otherwise the same image the avatar uses.
+  const full = src === `${PARTY_DIR}/${base}.webp` ? `${PARTY_DIR}/${base}-full.webp` : src;
 
   return (
     <motion.div
@@ -38,7 +46,12 @@ function MemberCard({ m, i }: { m: PartyMember; i: number }) {
       viewport={{ once: true, amount: 0.3 }}
       transition={{ duration: 0.6, delay: (i % 6) * 0.06 }}
     >
-      <div className="relative h-32 w-32 overflow-hidden rounded-full border border-white/70 shadow-lg ring-1 ring-black/5 sm:h-36 sm:w-36">
+      <div
+        onClick={() => src && full && openLightbox(full)}
+        className={`relative h-32 w-32 overflow-hidden rounded-full border border-white/70 shadow-lg ring-1 ring-black/5 transition-transform sm:h-36 sm:w-36 ${
+          src ? "cursor-pointer hover:scale-105" : ""
+        }`}
+      >
         {src ? (
           <img
             src={src}
