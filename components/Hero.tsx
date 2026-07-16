@@ -18,7 +18,7 @@ export default function Hero() {
   const titleOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
 
   return (
-    <section ref={ref} id="top" className="relative h-screen w-full overflow-hidden">
+    <section ref={ref} id="top" className="relative h-svh w-full overflow-hidden">
       {/* Intro "settle" zoom: the hero appears already pushed-in and eases to
           rest, continuing the splash dive so the hand-off feels seamless. */}
       <motion.div
@@ -44,6 +44,11 @@ export default function Hero() {
         <h1 className="display px-6 text-6xl italic text-white drop-shadow-[0_2px_20px_rgba(0,0,0,0.45)] sm:text-7xl md:text-8xl lg:text-9xl">
           {couple.names}
         </h1>
+        <p className="mt-4 flex items-center gap-3 text-xs uppercase tracking-[0.35em] text-white/90 drop-shadow-[0_1px_10px_rgba(0,0,0,0.6)] sm:text-sm">
+          <span className="h-px w-8 bg-white/60" />
+          {couple.dateDisplay}
+          <span className="h-px w-8 bg-white/60" />
+        </p>
       </motion.div>
 
       <motion.div

@@ -13,9 +13,10 @@ export const couple = {
   names: "Jesse & Francesca",
   // Short monogram used in the nav and splash
   monogram: "J&F",
-  // ISO date+time of the wedding — drives the countdown. (Local time.)
-  // TODO: confirm ceremony START TIME (set to 4:00pm as a placeholder).
-  date: "2027-12-11T16:00:00",
+  // ISO date+time of the wedding — drives the countdown. The -05:00 offset
+  // pins it to the venue's Eastern time (EST in December) so the countdown is
+  // correct for guests in every timezone, not each viewer's local 4:00pm.
+  date: "2027-12-11T16:00:00-05:00",
   // Human-friendly date shown in the reveal section
   dateDisplay: "December 11, 2027",
   venue: "Grand Cascades Lodge",

@@ -48,6 +48,15 @@ function MemberCard({ m, i }: { m: PartyMember; i: number }) {
     >
       <div
         onClick={() => src && full && openLightbox(full)}
+        onKeyDown={(e) => {
+          if (src && full && (e.key === "Enter" || e.key === " ")) {
+            e.preventDefault();
+            openLightbox(full);
+          }
+        }}
+        role={src ? "button" : undefined}
+        tabIndex={src ? 0 : undefined}
+        aria-label={src ? `View ${m.name}'s photo` : undefined}
         className={`relative h-32 w-32 overflow-hidden rounded-full border border-white/70 shadow-lg ring-1 ring-black/5 transition-transform sm:h-36 sm:w-36 ${
           src ? "cursor-pointer hover:scale-105" : ""
         }`}
@@ -70,7 +79,7 @@ function MemberCard({ m, i }: { m: PartyMember; i: number }) {
       </div>
       <h3 className="mt-4 font-serif text-2xl text-ink">{m.name}</h3>
       {m.role && (
-        <p className="mt-0.5 text-xs font-medium uppercase tracking-[0.2em] text-rust">
+        <p className="mt-0.5 text-xs font-medium uppercase tracking-[0.2em] text-rust-dark">
           {m.role}
         </p>
       )}

@@ -75,6 +75,7 @@ export default function EngagementPage() {
             <button
               key={src}
               onClick={() => openLightbox(src)}
+              aria-label={`View engagement photo ${i + 1} of ${galleryPhotos.length}`}
               className={`group block bg-white p-2 pb-5 shadow-[0_8px_18px_rgba(20,30,40,0.18)] transition-transform duration-300 hover:z-10 hover:rotate-0 hover:scale-[1.05] ${ROT[i % ROT.length]}`}
             >
               <div className="overflow-hidden">

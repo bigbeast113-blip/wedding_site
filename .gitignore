@@ -15,6 +15,8 @@
 _*.py
 *.output
 example.mp4
+VideoEnter.mp4
+/_vframes
 
 # large source assets — only their optimized copies in /public are deployed
 /engagmentphotogallery
@@ -33,3 +35,4 @@ Thumbs.db
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+_devlog.txt

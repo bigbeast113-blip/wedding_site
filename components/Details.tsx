@@ -6,6 +6,7 @@ import { details, DetailCard } from "@/content/wedding";
 import Blizzard from "./Blizzard";
 import { usePageTransition } from "./PageTransition";
 import { useLightbox } from "./Lightbox";
+import { useDialog } from "@/lib/useDialog";
 
 function Card({ card, onOpen }: { card: DetailCard; onOpen: () => void }) {
   return (
@@ -39,15 +40,19 @@ function Card({ card, onOpen }: { card: DetailCard; onOpen: () => void }) {
 
 function Modal({ card, onClose }: { card: DetailCard; onClose: () => void }) {
   const openLightbox = useLightbox();
+  useDialog(true, onClose); // lock scroll + Escape while the modal is mounted
   return (
     <motion.div
-      className="fixed inset-0 z-[90] flex items-start justify-center overflow-y-auto bg-black/40 p-4 backdrop-blur-sm sm:p-10"
+      className="fixed inset-0 z-[90] flex items-start justify-center overflow-y-auto overscroll-contain bg-black/40 p-4 backdrop-blur-sm sm:p-10"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       onClick={onClose}
     >
       <motion.div
+        role="dialog"
+        aria-modal="true"
+        aria-label={card.title}
         className="relative w-full max-w-2xl rounded-2xl bg-paper p-6 shadow-2xl sm:p-10"
         initial={{ opacity: 0, y: 40, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -75,10 +80,11 @@ function Modal({ card, onClose }: { card: DetailCard; onClose: () => void }) {
         {card.modal.gallery &&
           (card.modal.gallery.length ? (
             <div className="mt-6 grid grid-cols-3 gap-2 sm:gap-3">
-              {card.modal.gallery.map((src) => (
+              {card.modal.gallery.map((src, i) => (
                 <button
                   key={src}
                   onClick={() => openLightbox(src)}
+                  aria-label={`View photo ${i + 1} full screen`}
                   className="group relative aspect-square overflow-hidden rounded-lg"
                 >
                   <img
@@ -98,7 +104,7 @@ function Modal({ card, onClose }: { card: DetailCard; onClose: () => void }) {
 
         {card.modal.sections?.map((s) => (
           <div key={s.heading} className="mt-6">
-            <h4 className="text-xs uppercase tracking-[0.25em] text-rust">{s.heading}</h4>
+            <h4 className="text-xs uppercase tracking-[0.25em] text-rust-dark">{s.heading}</h4>
             <ul className="mt-3 space-y-3">
               {s.items.map((it) => (
                 <li key={it.name}>
@@ -134,7 +140,7 @@ function Modal({ card, onClose }: { card: DetailCard; onClose: () => void }) {
                 <div className="min-w-0">
                   <p className="font-serif text-lg text-ink">{h.name}</p>
                   <p className="text-sm text-stone">{h.desc}</p>
-                  <span className="mt-1 inline-block text-xs font-medium uppercase tracking-wide text-rust">
+                  <span className="mt-1 inline-block text-xs font-medium uppercase tracking-wide text-rust-dark">
                     Book a room →
                   </span>
                 </div>
@@ -151,7 +157,7 @@ function Modal({ card, onClose }: { card: DetailCard; onClose: () => void }) {
                 href={l.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-full border border-rust px-5 py-2 text-sm text-rust transition-colors hover:bg-rust hover:text-white"
+                className="rounded-full border border-rust px-5 py-2 text-sm text-rust-dark transition-colors hover:bg-rust hover:text-white"
               >
                 {l.label}
               </a>

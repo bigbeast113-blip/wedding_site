@@ -46,7 +46,16 @@ function ScatterImg({
       <motion.img
         src={src}
         alt=""
+        role="button"
+        tabIndex={0}
+        aria-label="View photo full screen"
         onClick={() => openLightbox(src)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            openLightbox(src);
+          }
+        }}
         style={{ x, y, rotate, opacity }}
         className="block w-full cursor-pointer rounded-md border-[5px] border-white object-cover shadow-2xl sm:border-[6px]"
       />

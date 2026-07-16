@@ -26,7 +26,16 @@ function PolaroidStack({ photos, caption }: { photos: string[]; caption: string 
             style={{ zIndex: photos.length - i }}
           >
             <motion.div
+              role="button"
+              tabIndex={0}
+              aria-label="View photo full screen"
               onClick={() => openLightbox(src)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  openLightbox(src);
+                }
+              }}
               className="cursor-pointer rounded-sm bg-white p-2.5 pb-8 shadow-xl sm:p-3 sm:pb-10"
               initial={{ rotate: 0, x: 0, y: 0, opacity: 0 }}
               whileInView={{ rotate: rot, x: tx, y: ty, opacity: 1 }}

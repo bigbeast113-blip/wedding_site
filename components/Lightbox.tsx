@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useDialog } from "@/lib/useDialog";
 
 const LightboxContext = createContext<(src: string) => void>(() => {});
 
@@ -10,6 +11,7 @@ export const useLightbox = () => useContext(LightboxContext);
 
 export function LightboxProvider({ children }: { children: ReactNode }) {
   const [src, setSrc] = useState<string | null>(null);
+  useDialog(!!src, () => setSrc(null));
 
   return (
     <LightboxContext.Provider value={setSrc}>
@@ -18,7 +20,10 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
       <AnimatePresence>
         {src && (
           <motion.div
-            className="fixed inset-0 z-[110] flex items-center justify-center bg-black/85 p-4 backdrop-blur-md"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Photo"
+            className="fixed inset-0 z-[110] flex items-center justify-center overscroll-contain bg-black/85 p-4 backdrop-blur-md"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { couple, rsvp } from "@/content/wedding";
 import Burst from "./Burst";
+import { useDialog } from "@/lib/useDialog";
 
 // A household from the guest sheet: a main invitee + an optional plus-one.
 //   plus === ""      -> no plus-one (solo)
@@ -67,16 +68,27 @@ export default function RsvpModal({ open, onClose }: { open: boolean; onClose: (
   const [quiz, setQuiz] = useState<string[]>(() => rsvp.quiz.map(() => ""));
   const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
+  // Whether the guest list has settled (fetched, or confirmed there's no sheet).
+  // Distinguishes "still loading" from "truly empty" so we don't drop a guest's
+  // household by treating an in-flight fetch as a walk-in.
+  const [loaded, setLoaded] = useState(false);
 
   // Load the live guest list when the modal opens.
   useEffect(() => {
-    if (!open || !rsvp.guestSheet.id) return;
+    if (!open) return;
+    if (!rsvp.guestSheet.id) {
+      setLoaded(true); // no sheet configured -> walk-in RSVP
+      return;
+    }
     let cancelled = false;
     fetchHouseholds()
       .then((list) => {
         if (!cancelled && list.length) setHouseholds(list);
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setLoaded(true);
+      });
     return () => {
       cancelled = true;
     };
@@ -106,6 +118,8 @@ export default function RsvpModal({ open, onClose }: { open: boolean; onClose: (
     window.setTimeout(reset, 350);
   }
 
+  useDialog(open, handleClose); // lock background scroll + close on Escape
+
   function selectHousehold(h: Household) {
     setHousehold(h);
     setMainStatus(null);
@@ -118,13 +132,25 @@ export default function RsvpModal({ open, onClose }: { open: boolean; onClose: (
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    if (!loaded) return; // guest list still loading — don't fabricate a walk-in
     // No live list (sheet empty/unreachable) -> open RSVP with the typed name.
     if (!households.length) {
       if (!query.trim()) return;
       selectHousehold({ name: query.trim(), plus: "", guestName: "" });
       return;
     }
-    if (results.length) selectHousehold(results[0]); // Enter picks the top match
+    if (results.length) {
+      // Enter should prefer an exact name match, not just the first row that
+      // contains the query as a substring (avoids opening the wrong invitation).
+      const n = norm(query);
+      const exact = results.find(
+        (h) =>
+          norm(h.name) === n ||
+          (!!h.plus && !isGuest(h.plus) && norm(h.plus) === n) ||
+          (!!h.guestName && norm(h.guestName) === n)
+      );
+      selectHousehold(exact ?? results[0]);
+    }
   }
 
   const attendingCount =
@@ -209,13 +235,16 @@ export default function RsvpModal({ open, onClose }: { open: boolean; onClose: (
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[95] flex items-start justify-center overflow-y-auto bg-black/50 p-4 backdrop-blur-sm sm:items-center sm:p-10"
+          className="fixed inset-0 z-[95] flex items-start justify-center overflow-y-auto overscroll-contain bg-black/50 p-4 backdrop-blur-sm sm:items-center sm:p-10"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={handleClose}
         >
           <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-label="RSVP"
             className="relative w-full max-w-lg rounded-2xl bg-paper p-6 shadow-2xl sm:p-10"
             initial={{ opacity: 0, y: 40, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -325,7 +354,11 @@ export default function RsvpModal({ open, onClose }: { open: boolean; onClose: (
                   className="mt-4 w-full rounded-lg border border-ink/15 bg-white/60 px-3 py-2.5 text-sm text-ink outline-none focus:border-rust"
                 />
 
-                {households.length > 0 ? (
+                {!loaded ? (
+                  <p className="mt-4 rounded-lg bg-white/50 px-3 py-2.5 text-sm text-stone">
+                    Loading the guest list…
+                  </p>
+                ) : households.length > 0 ? (
                   <div className="mt-3 space-y-2">
                     {results.map((h, i) => (
                       <button

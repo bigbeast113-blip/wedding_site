@@ -153,6 +153,14 @@ export default function Splash({ onEnter }: { onEnter: () => void }) {
             "radial-gradient(ellipse 80% 75% at 50% 42%, rgba(10,16,24,0) 45%, rgba(10,16,24,0.28) 78%, rgba(10,16,24,0.6) 100%)",
         }}
       />
+      {/* top scrim so the names read crisply over the bright canopy */}
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-[44%]"
+        style={{
+          background:
+            "linear-gradient(to bottom, rgba(8,14,22,0.6) 0%, rgba(8,14,22,0.22) 55%, transparent 100%)",
+        }}
+      />
 
       {/* 7 — drifting snow */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -173,36 +181,72 @@ export default function Splash({ onEnter }: { onEnter: () => void }) {
         ))}
       </div>
 
-      {/* 8 — tagline + enter button */}
+      {/* 8 — names + date, anchored near the top so they clear the faces */}
       <motion.div
-        className="relative z-10 mb-[12vh] flex flex-col items-center px-6 text-center text-white"
+        className="pointer-events-none absolute inset-x-0 top-[10vh] z-10 flex flex-col items-center px-6 text-center text-white sm:top-[12vh]"
         animate={{ opacity: entering ? 0 : 1 }}
         transition={{ duration: entering ? 0.5 : 1 }}
       >
         <motion.span
-          className="mb-3 text-xs uppercase tracking-[0.5em] text-white/80 drop-shadow"
+          className="mb-3 text-xs uppercase tracking-[0.5em] text-white/85 drop-shadow-[0_1px_8px_rgba(0,0,0,0.9)]"
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.9, duration: 1 }}
+          transition={{ delay: 0.7, duration: 1 }}
         >
           {couple.monogram}
         </motion.span>
 
-        <motion.p
-          className="display max-w-xl text-3xl italic text-white drop-shadow-[0_2px_16px_rgba(0,0,0,0.9)] sm:text-4xl"
+        <motion.h1
+          className="display text-5xl italic text-white drop-shadow-[0_3px_22px_rgba(0,0,0,0.85)] sm:text-7xl md:text-8xl"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.2, duration: 1.2 }}
+          transition={{ delay: 0.9, duration: 1.2 }}
+        >
+          {couple.names}
+        </motion.h1>
+
+        <motion.div
+          className="mt-4 flex items-center gap-3 text-[0.7rem] uppercase tracking-[0.35em] text-white/90 drop-shadow-[0_1px_8px_rgba(0,0,0,0.9)] sm:text-sm"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.25, duration: 1 }}
+        >
+          <span className="h-px w-6 bg-white/60 sm:w-10" />
+          {couple.dateDisplay}
+          <span className="h-px w-6 bg-white/60 sm:w-10" />
+        </motion.div>
+
+        <motion.p
+          className="mt-2 text-[0.6rem] uppercase tracking-[0.3em] text-white/75 drop-shadow-[0_1px_8px_rgba(0,0,0,0.9)] sm:text-xs"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5, duration: 1 }}
+        >
+          {couple.venue} · {couple.city}
+        </motion.p>
+      </motion.div>
+
+      {/* 9 — tagline + enter button, over the bottom mist */}
+      <motion.div
+        className="relative z-10 mb-[10vh] flex flex-col items-center px-6 text-center text-white"
+        animate={{ opacity: entering ? 0 : 1 }}
+        transition={{ duration: entering ? 0.5 : 1 }}
+      >
+        <motion.p
+          className="display max-w-xl text-2xl italic text-white drop-shadow-[0_2px_16px_rgba(0,0,0,0.95)] sm:text-3xl"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.3, duration: 1.2 }}
         >
           {splash.tagline}
         </motion.p>
 
         <motion.button
           onClick={enter}
-          className="mt-8 rounded-full border border-white/80 bg-black/35 px-8 py-3 text-xs uppercase tracking-[0.35em] text-white backdrop-blur-sm transition-colors hover:bg-white hover:text-ink"
+          className="mt-7 rounded-full border border-white/90 bg-black/45 px-9 py-3.5 text-xs uppercase tracking-[0.35em] text-white shadow-[0_10px_34px_rgba(0,0,0,0.4)] backdrop-blur-md transition-colors hover:bg-white hover:text-ink"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.7, duration: 1 }}
+          transition={{ delay: 1.8, duration: 1 }}
           whileHover={{ scale: 1.04 }}
           whileTap={{ scale: 0.97 }}
         >

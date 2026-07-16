@@ -40,6 +40,23 @@ body {
   }
 }
 
+/* Falling petals (DateReveal). Authored here because the inline `animation:`
+   on each petal references this by name; Tailwind only emits keyframes that a
+   used `animate-*` utility references, so it must live in CSS directly. */
+@keyframes fall {
+  0% {
+    transform: translateY(-10vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(110vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
 /* Slowly drifting fog band */
 @keyframes fogdrift {
   0% {
