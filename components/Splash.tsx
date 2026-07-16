@@ -4,27 +4,20 @@ import { useMemo, useState } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { splash, couple } from "@/content/wedding";
 
-const ZOOM = { duration: 1.9, ease: [0.5, 0, 0.85, 0.4] as const };
+// The enter animation: a long push straight through the portal opening.
+const ZOOM = { duration: 2.4, ease: [0.5, 0, 0.85, 0.4] as const };
 const REST = { duration: 1.2, ease: "easeOut" as const };
-
-// Soft feather so foreground branches melt away at every edge (no hard lines).
-const softEdge =
-  "radial-gradient(ellipse 72% 80% at 50% 52%, #000 30%, rgba(0,0,0,0.55) 60%, transparent 86%)";
 
 export default function Splash({ onEnter }: { onEnter: () => void }) {
   const [entering, setEntering] = useState(false);
 
+  // Gentle mouse parallax (disabled once we start diving in).
   const mx = useSpring(0, { stiffness: 55, damping: 16, mass: 0.5 });
   const my = useSpring(0, { stiffness: 55, damping: 16, mass: 0.5 });
-
-  const bgX = useTransform(mx, (v) => v * 8);
-  const bgY = useTransform(my, (v) => v * 6);
-  const coX = useTransform(mx, (v) => v * 15);
-  const coY = useTransform(my, (v) => v * 11);
-  const flX = useTransform(mx, (v) => v * 55); // foreground branches (closest)
-  const flY = useTransform(my, (v) => v * 40);
-  const topX = useTransform(mx, (v) => v * 38);
-  const topY = useTransform(my, (v) => v * 28);
+  const bgX = useTransform(mx, (v) => v * 6);
+  const bgY = useTransform(my, (v) => v * 5);
+  const coX = useTransform(mx, (v) => v * 16);
+  const coY = useTransform(my, (v) => v * 12);
 
   const flakes = useMemo(
     () =>
@@ -50,119 +43,73 @@ export default function Splash({ onEnter }: { onEnter: () => void }) {
     setEntering(true);
     mx.set(0);
     my.set(0);
-    window.setTimeout(onEnter, 850);
+    window.setTimeout(onEnter, 1150);
   }
-
-  const z = (s: number, x?: string, y?: string) =>
-    entering ? { scale: s, x: x ?? "0%", y: y ?? "0%" } : { scale: 1, x: "0%", y: "0%" };
 
   return (
     <motion.div
       onMouseMove={handleMouse}
-      className="fixed inset-0 z-[100] flex items-end justify-center overflow-hidden bg-[#aeb7bd]"
+      className="fixed inset-0 z-[100] flex items-end justify-center overflow-hidden bg-[#0b1420]"
       initial={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.9, ease: "easeInOut" }}
     >
-      {/* 1 — full snowy-forest scene (no tiling, no seams) */}
+      {/* 1 — the winter portal. Scaling into the centre = flying through the
+             opening (the archway sits at the frame edges, valley in the middle). */}
       <motion.div className="absolute inset-0" style={{ x: bgX, y: bgY }}>
         <motion.img
           src={splash.backdrop}
           alt=""
-          className="absolute inset-0 h-full w-full scale-110 object-cover"
-          animate={entering ? { scale: 1.5 } : { scale: 1.1 }}
+          className="absolute inset-0 hidden h-full w-full scale-105 object-cover sm:block"
+          animate={entering ? { scale: 2.9 } : { scale: 1.05 }}
+          transition={entering ? ZOOM : REST}
+        />
+        <motion.img
+          src={splash.backdropTall}
+          alt=""
+          className="absolute inset-0 h-full w-full scale-105 object-cover sm:hidden"
+          animate={entering ? { scale: 2.9 } : { scale: 1.05 }}
           transition={entering ? ZOOM : REST}
         />
       </motion.div>
 
-      {/* 2 — faint blurred branches up high for depth (feathered, no hard edges) */}
-      <motion.div className="absolute inset-0" style={{ x: topX, y: topY }}>
-        <motion.img
-          src={splash.foliage}
-          alt=""
-          className="absolute -left-[8%] -top-[10%] w-[42%] -scale-x-100 blur-[7px]"
-          style={{ maskImage: softEdge, WebkitMaskImage: softEdge, opacity: 0.35 }}
-          animate={z(2.2, "-30%", "-30%")}
-          transition={entering ? ZOOM : REST}
-        />
-        <motion.img
-          src={splash.foliage}
-          alt=""
-          className="absolute -right-[8%] -top-[10%] w-[42%] blur-[7px]"
-          style={{ maskImage: softEdge, WebkitMaskImage: softEdge, opacity: 0.35 }}
-          animate={z(2.2, "30%", "-30%")}
-          transition={entering ? ZOOM : REST}
-        />
-      </motion.div>
-
-      {/* 3 — the two of you, standing in the woods (cooled to match the scene) */}
-      <motion.div className="absolute inset-0 flex items-end justify-center" style={{ x: coX, y: coY }}>
+      {/* 2 — the two of you, small, standing on the path in the opening */}
+      <motion.div
+        className="pointer-events-none absolute inset-0 flex items-center justify-center"
+        style={{ x: coX, y: coY }}
+      >
         <motion.img
           src={splash.couple}
           alt={couple.names}
-          className="max-h-[72vh] w-auto object-contain"
+          className="w-auto object-contain"
           style={{
-            marginBottom: "2vh",
-            filter:
-              "saturate(0.82) brightness(0.96) contrast(1.03) drop-shadow(0 22px 26px rgba(15,22,30,0.5))",
+            maxHeight: "15vh",
+            marginTop: "9vh",
+            filter: "brightness(0.98) drop-shadow(0 8px 16px rgba(8,16,26,0.55))",
           }}
-          initial={{ opacity: 0, y: 12 }}
-          animate={entering ? { opacity: 1, scale: 2.5, y: -30 } : { opacity: 1, scale: 1, y: 0 }}
-          transition={entering ? ZOOM : { opacity: { duration: 1.4 }, default: REST }}
+          initial={{ opacity: 0, y: 8 }}
+          animate={entering ? { opacity: 0, scale: 5, y: -70 } : { opacity: 1, scale: 1, y: 0 }}
+          transition={entering ? ZOOM : { opacity: { duration: 1.6 }, default: REST }}
         />
       </motion.div>
 
-      {/* 4 — bottom mist: veils the cutout's lower edge so you melt into the snow */}
-      <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-[42%]"
-        style={{
-          background:
-            "linear-gradient(to top, rgba(228,236,242,0.92) 0%, rgba(228,236,242,0.55) 35%, rgba(228,236,242,0) 100%)",
-        }}
-      />
-
-      {/* 5 — soft, out-of-focus foreground branches at the bottom corners */}
-      <motion.div className="absolute inset-0" style={{ x: flX, y: flY }}>
-        <motion.img
-          src={splash.foliage}
-          alt=""
-          className="absolute -bottom-[14%] -left-[10%] w-[56%] blur-[9px]"
-          style={{ maskImage: softEdge, WebkitMaskImage: softEdge, opacity: 0.55 }}
-          animate={z(2.8, "-30%", "30%")}
-          transition={entering ? ZOOM : REST}
-        />
-        <motion.img
-          src={splash.foliage}
-          alt=""
-          className="absolute -bottom-[14%] -right-[10%] w-[58%] -scale-x-100 blur-[10px]"
-          style={{ maskImage: softEdge, WebkitMaskImage: softEdge, opacity: 0.55 }}
-          animate={z(3.0, "30%", "30%")}
-          transition={entering ? ZOOM : REST}
-        />
-      </motion.div>
-
-      {/* 6 — unifying cool wash + vignette so everything shares one light */}
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{ background: "rgba(120,140,170,0.1)" }}
-      />
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse 80% 75% at 50% 42%, rgba(10,16,24,0) 45%, rgba(10,16,24,0.28) 78%, rgba(10,16,24,0.6) 100%)",
-        }}
-      />
-      {/* top scrim so the names read crisply over the bright canopy */}
+      {/* 3 — scrims so the type reads over the bright snow */}
       <div
         className="pointer-events-none absolute inset-x-0 top-0 h-[44%]"
         style={{
           background:
-            "linear-gradient(to bottom, rgba(8,14,22,0.6) 0%, rgba(8,14,22,0.22) 55%, transparent 100%)",
+            "linear-gradient(to bottom, rgba(8,14,22,0.62) 0%, rgba(8,14,22,0.16) 60%, transparent 100%)",
+        }}
+      />
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-[40%]"
+        style={{
+          background:
+            "linear-gradient(to top, rgba(8,14,22,0.74) 0%, rgba(8,14,22,0.28) 45%, transparent 100%)",
         }}
       />
 
-      {/* 7 — drifting snow */}
+      {/* 4 — drifting snow */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         {flakes.map((f, i) => (
           <span
@@ -181,9 +128,9 @@ export default function Splash({ onEnter }: { onEnter: () => void }) {
         ))}
       </div>
 
-      {/* 8 — names + date, anchored near the top so they clear the faces */}
+      {/* 5 — names + date, anchored near the top */}
       <motion.div
-        className="pointer-events-none absolute inset-x-0 top-[10vh] z-10 flex flex-col items-center px-6 text-center text-white sm:top-[12vh]"
+        className="pointer-events-none absolute inset-x-0 top-[8vh] z-10 flex flex-col items-center px-6 text-center text-white sm:top-[10vh]"
         animate={{ opacity: entering ? 0 : 1 }}
         transition={{ duration: entering ? 0.5 : 1 }}
       >
@@ -226,9 +173,9 @@ export default function Splash({ onEnter }: { onEnter: () => void }) {
         </motion.p>
       </motion.div>
 
-      {/* 9 — tagline + enter button, over the bottom mist */}
+      {/* 6 — tagline + enter button */}
       <motion.div
-        className="relative z-10 mb-[10vh] flex flex-col items-center px-6 text-center text-white"
+        className="relative z-10 mb-[8vh] flex flex-col items-center px-6 text-center text-white"
         animate={{ opacity: entering ? 0 : 1 }}
         transition={{ duration: entering ? 0.5 : 1 }}
       >
@@ -243,7 +190,7 @@ export default function Splash({ onEnter }: { onEnter: () => void }) {
 
         <motion.button
           onClick={enter}
-          className="mt-7 rounded-full border border-white/90 bg-black/45 px-9 py-3.5 text-xs uppercase tracking-[0.35em] text-white shadow-[0_10px_34px_rgba(0,0,0,0.4)] backdrop-blur-md transition-colors hover:bg-white hover:text-ink"
+          className="mt-7 rounded-full border border-white/90 bg-black/45 px-9 py-3.5 text-xs uppercase tracking-[0.35em] text-white shadow-[0_10px_34px_rgba(0,0,0,0.45)] backdrop-blur-md transition-colors hover:bg-white hover:text-ink"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.8, duration: 1 }}

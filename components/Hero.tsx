@@ -23,9 +23,9 @@ export default function Hero() {
           rest, continuing the splash dive so the hand-off feels seamless. */}
       <motion.div
         className="absolute inset-0"
-        initial={{ scale: 1.3 }}
+        initial={{ scale: 1.45 }}
         animate={{ scale: 1 }}
-        transition={{ duration: 1.5, ease: [0.22, 0.1, 0.25, 1] }}
+        transition={{ duration: 1.7, ease: [0.22, 0.1, 0.25, 1] }}
       >
         <motion.img
           src={hero.image}
