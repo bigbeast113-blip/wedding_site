@@ -32,12 +32,14 @@ export const splash = {
   // Mouse moves the layers (parallax); clicking "Click to Enter" dives through.
   // A single cinematic "winter portal" image (archway of frosted pines opening
   // onto a snowy valley). Clicking enter dives THROUGH the opening.
-  // TRUE separate layers (different images -> crisp, no ghosting):
-  vista: "/photos/winter-vista.webp", // BACK — the valley seen through the opening
-  vistaTall: "/photos/winter-vista-tall.webp",
-  frame: "/photos/winter-frame.webp", // FRONT — the archway, center cut to transparent
+  // Layered "winter portal": the proposal scene sits behind two foliage layers
+  // that fly toward the viewer on enter, revealing the full background.
+  bg: "/photos/winter-bg.webp", // BACK — the full proposal scene (revealed)
+  bgTall: "/photos/winter-bg-tall.webp",
+  frame: "/photos/winter-frame.webp", // FAR foliage — the archway (center cut out)
   frameTall: "/photos/winter-frame-tall.webp",
-  couple: "/photos/cutouts/couple-winter.png", // MIDDLE — stands in the opening, behind the frame's snow
+  near: "/photos/winter-near.webp", // NEAR foliage — the closest snow bank
+  nearTall: "/photos/winter-near-tall.webp",
   tagline: "an adventure to wonderland awaits",
   cta: "Click to Enter",
 };
@@ -58,8 +60,8 @@ export const decoTrees = {
 };
 
 export const hero = {
-  // Full-bleed portrait behind the names (name sits low to keep faces visible).
-  image: "/photos/new/img_3452.webp",
+  // The revealed proposal scene — continues seamlessly from the splash.
+  image: "/photos/winter-bg.webp",
   scrollHint: "scroll to explore",
 };
 

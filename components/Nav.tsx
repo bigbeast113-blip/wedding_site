@@ -11,7 +11,7 @@ export default function Nav({ onRsvp }: { onRsvp: () => void }) {
       className="fixed inset-x-0 top-4 z-50 flex justify-center px-4"
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.4, duration: 0.8 }}
+      transition={{ delay: 0.9, duration: 1.1 }}
     >
       <nav className="flex w-full max-w-4xl items-center justify-between gap-4 rounded-full border border-black/5 bg-paper/80 px-5 py-2.5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] backdrop-blur-md">
         <a href="#top" className="font-serif text-xl font-semibold tracking-tight text-ink">

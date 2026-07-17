@@ -45,9 +45,8 @@ export default function Page() {
       <AnimatePresence>
         {entered && (
           <motion.main
-            initial={{ opacity: 0 }}
+            initial={{ opacity: 1 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.6 }}
           >
             <Nav onRsvp={() => setRsvpOpen(true)} />
             <Hero />
