@@ -14,13 +14,13 @@ export default function Splash({ onEnter }: { onEnter: () => void }) {
   // Gentle mouse parallax (disabled once we start diving in).
   const mx = useSpring(0, { stiffness: 55, damping: 16, mass: 0.5 });
   const my = useSpring(0, { stiffness: 55, damping: 16, mass: 0.5 });
-  // Parallax depth: far vista barely moves, couple a bit, the near archway most.
-  const bgX = useTransform(mx, (v) => v * 4);
-  const bgY = useTransform(my, (v) => v * 3);
-  const coX = useTransform(mx, (v) => v * 11);
-  const coY = useTransform(my, (v) => v * 8);
-  const fgX = useTransform(mx, (v) => v * 24);
-  const fgY = useTransform(my, (v) => v * 17);
+  // Parallax depth: the far scene barely moves, couple a little, near snow most.
+  const bgX = useTransform(mx, (v) => v * 3);
+  const bgY = useTransform(my, (v) => v * 2);
+  const coX = useTransform(mx, (v) => v * 8);
+  const coY = useTransform(my, (v) => v * 5);
+  const fgX = useTransform(mx, (v) => v * 15);
+  const fgY = useTransform(my, (v) => v * 10);
 
   const flakes = useMemo(
     () =>
@@ -86,8 +86,8 @@ export default function Splash({ onEnter }: { onEnter: () => void }) {
           alt={couple.names}
           className="w-auto object-contain"
           style={{
-            maxHeight: "24vh",
-            marginTop: "11vh",
+            maxHeight: "23vh",
+            marginTop: "13vh",
             filter: "brightness(0.98) drop-shadow(0 12px 22px rgba(8,16,26,0.62))",
           }}
           initial={{ opacity: 0, y: 8 }}
@@ -96,21 +96,21 @@ export default function Splash({ onEnter }: { onEnter: () => void }) {
         />
       </motion.div>
 
-      {/* 3 — FRONT layer: the archway (opening cut out) sits in front of the
-             couple and rushes past the camera on the dive-through */}
+      {/* 3 — FRONT near-snow: the couple stands BEHIND this bank; it slides
+             toward the camera on the dive */}
       <motion.div className="pointer-events-none absolute inset-0" style={{ x: fgX, y: fgY }}>
         <motion.img
-          src={splash.arch}
+          src={splash.foreground}
           alt=""
           className="absolute inset-0 hidden h-full w-full scale-105 object-cover sm:block"
-          animate={entering ? { scale: 4.4, opacity: 0 } : { scale: 1.05, opacity: 1 }}
+          animate={entering ? { scale: 1.7, y: "22%", opacity: 0 } : { scale: 1.05, y: "0%", opacity: 1 }}
           transition={entering ? ZOOM : REST}
         />
         <motion.img
-          src={splash.archTall}
+          src={splash.foregroundTall}
           alt=""
           className="absolute inset-0 h-full w-full scale-105 object-cover sm:hidden"
-          animate={entering ? { scale: 4.4, opacity: 0 } : { scale: 1.05, opacity: 1 }}
+          animate={entering ? { scale: 1.7, y: "22%", opacity: 0 } : { scale: 1.05, y: "0%", opacity: 1 }}
           transition={entering ? ZOOM : REST}
         />
       </motion.div>
