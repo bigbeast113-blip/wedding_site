@@ -32,11 +32,12 @@ export const splash = {
   // Mouse moves the layers (parallax); clicking "Click to Enter" dives through.
   // A single cinematic "winter portal" image (archway of frosted pines opening
   // onto a snowy valley). Clicking enter dives THROUGH the opening.
-  backdrop: "/photos/winter-portal.webp", // wide 16:9 (desktop) — BACK layer (vista)
-  backdropTall: "/photos/winter-portal-tall.webp", // 9:16 (mobile)
-  foreground: "/photos/winter-fg.webp", // FRONT near-snow the couple stands behind
-  foregroundTall: "/photos/winter-fg-tall.webp",
-  couple: "/photos/cutouts/couple-winter.png", // clean cutout, cool-graded — MIDDLE layer
+  // TRUE separate layers (different images -> crisp, no ghosting):
+  vista: "/photos/winter-vista.webp", // BACK — the valley seen through the opening
+  vistaTall: "/photos/winter-vista-tall.webp",
+  frame: "/photos/winter-frame.webp", // FRONT — the archway, center cut to transparent
+  frameTall: "/photos/winter-frame-tall.webp",
+  couple: "/photos/cutouts/couple-winter.png", // MIDDLE — stands in the opening, behind the frame's snow
   tagline: "an adventure to wonderland awaits",
   cta: "Click to Enter",
 };

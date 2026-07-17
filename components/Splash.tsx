@@ -61,17 +61,17 @@ export default function Splash({ onEnter }: { onEnter: () => void }) {
              opening (the archway sits at the frame edges, valley in the middle). */}
       <motion.div className="absolute inset-0" style={{ x: bgX, y: bgY }}>
         <motion.img
-          src={splash.backdrop}
+          src={splash.vista}
           alt=""
           className="absolute inset-0 hidden h-full w-full scale-105 object-cover sm:block"
-          animate={entering ? { scale: 2.4 } : { scale: 1.05 }}
+          animate={entering ? { scale: 2.2 } : { scale: 1.05 }}
           transition={entering ? ZOOM : REST}
         />
         <motion.img
-          src={splash.backdropTall}
+          src={splash.vistaTall}
           alt=""
           className="absolute inset-0 h-full w-full scale-105 object-cover sm:hidden"
-          animate={entering ? { scale: 2.4 } : { scale: 1.05 }}
+          animate={entering ? { scale: 2.2 } : { scale: 1.05 }}
           transition={entering ? ZOOM : REST}
         />
       </motion.div>
@@ -86,31 +86,32 @@ export default function Splash({ onEnter }: { onEnter: () => void }) {
           alt={couple.names}
           className="w-auto object-contain"
           style={{
-            maxHeight: "23vh",
-            marginTop: "13vh",
-            filter: "brightness(0.98) drop-shadow(0 12px 22px rgba(8,16,26,0.62))",
+            maxHeight: "25vh",
+            marginTop: "15vh",
+            filter: "brightness(1) drop-shadow(0 12px 22px rgba(8,16,26,0.6))",
           }}
           initial={{ opacity: 0, y: 8 }}
-          animate={entering ? { opacity: 0, scale: 4, y: -70 } : { opacity: 1, scale: 1, y: 0 }}
+          animate={entering ? { opacity: 0, scale: 3.5, y: -60 } : { opacity: 1, scale: 1, y: 0 }}
           transition={entering ? ZOOM : { opacity: { duration: 1.6 }, default: REST }}
         />
       </motion.div>
 
-      {/* 3 — FRONT near-snow: the couple stands BEHIND this bank; it slides
-             toward the camera on the dive */}
+      {/* 3 — FRONT archway (center cut out): frames the couple, and rushes past
+             the camera on the dive-through. Different image from the vista, so
+             it stays razor-sharp with no ghosting. */}
       <motion.div className="pointer-events-none absolute inset-0" style={{ x: fgX, y: fgY }}>
         <motion.img
-          src={splash.foreground}
+          src={splash.frame}
           alt=""
           className="absolute inset-0 hidden h-full w-full scale-105 object-cover sm:block"
-          animate={entering ? { scale: 1.7, y: "22%", opacity: 0 } : { scale: 1.05, y: "0%", opacity: 1 }}
+          animate={entering ? { scale: 4, opacity: 0 } : { scale: 1.05, opacity: 1 }}
           transition={entering ? ZOOM : REST}
         />
         <motion.img
-          src={splash.foregroundTall}
+          src={splash.frameTall}
           alt=""
           className="absolute inset-0 h-full w-full scale-105 object-cover sm:hidden"
-          animate={entering ? { scale: 1.7, y: "22%", opacity: 0 } : { scale: 1.05, y: "0%", opacity: 1 }}
+          animate={entering ? { scale: 4, opacity: 0 } : { scale: 1.05, opacity: 1 }}
           transition={entering ? ZOOM : REST}
         />
       </motion.div>
