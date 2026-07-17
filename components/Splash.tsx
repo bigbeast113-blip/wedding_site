@@ -14,10 +14,13 @@ export default function Splash({ onEnter }: { onEnter: () => void }) {
   // Gentle mouse parallax (disabled once we start diving in).
   const mx = useSpring(0, { stiffness: 55, damping: 16, mass: 0.5 });
   const my = useSpring(0, { stiffness: 55, damping: 16, mass: 0.5 });
-  const bgX = useTransform(mx, (v) => v * 6);
-  const bgY = useTransform(my, (v) => v * 5);
-  const coX = useTransform(mx, (v) => v * 16);
-  const coY = useTransform(my, (v) => v * 12);
+  // Parallax depth: far vista barely moves, couple a bit, the near archway most.
+  const bgX = useTransform(mx, (v) => v * 4);
+  const bgY = useTransform(my, (v) => v * 3);
+  const coX = useTransform(mx, (v) => v * 11);
+  const coY = useTransform(my, (v) => v * 8);
+  const fgX = useTransform(mx, (v) => v * 24);
+  const fgY = useTransform(my, (v) => v * 17);
 
   const flakes = useMemo(
     () =>
@@ -61,14 +64,14 @@ export default function Splash({ onEnter }: { onEnter: () => void }) {
           src={splash.backdrop}
           alt=""
           className="absolute inset-0 hidden h-full w-full scale-105 object-cover sm:block"
-          animate={entering ? { scale: 2.9 } : { scale: 1.05 }}
+          animate={entering ? { scale: 2.4 } : { scale: 1.05 }}
           transition={entering ? ZOOM : REST}
         />
         <motion.img
           src={splash.backdropTall}
           alt=""
           className="absolute inset-0 h-full w-full scale-105 object-cover sm:hidden"
-          animate={entering ? { scale: 2.9 } : { scale: 1.05 }}
+          animate={entering ? { scale: 2.4 } : { scale: 1.05 }}
           transition={entering ? ZOOM : REST}
         />
       </motion.div>
@@ -83,17 +86,36 @@ export default function Splash({ onEnter }: { onEnter: () => void }) {
           alt={couple.names}
           className="w-auto object-contain"
           style={{
-            maxHeight: "15vh",
-            marginTop: "9vh",
-            filter: "brightness(0.98) drop-shadow(0 8px 16px rgba(8,16,26,0.55))",
+            maxHeight: "24vh",
+            marginTop: "11vh",
+            filter: "brightness(0.98) drop-shadow(0 12px 22px rgba(8,16,26,0.62))",
           }}
           initial={{ opacity: 0, y: 8 }}
-          animate={entering ? { opacity: 0, scale: 5, y: -70 } : { opacity: 1, scale: 1, y: 0 }}
+          animate={entering ? { opacity: 0, scale: 4, y: -70 } : { opacity: 1, scale: 1, y: 0 }}
           transition={entering ? ZOOM : { opacity: { duration: 1.6 }, default: REST }}
         />
       </motion.div>
 
-      {/* 3 — scrims so the type reads over the bright snow */}
+      {/* 3 — FRONT layer: the archway (opening cut out) sits in front of the
+             couple and rushes past the camera on the dive-through */}
+      <motion.div className="pointer-events-none absolute inset-0" style={{ x: fgX, y: fgY }}>
+        <motion.img
+          src={splash.arch}
+          alt=""
+          className="absolute inset-0 hidden h-full w-full scale-105 object-cover sm:block"
+          animate={entering ? { scale: 4.4, opacity: 0 } : { scale: 1.05, opacity: 1 }}
+          transition={entering ? ZOOM : REST}
+        />
+        <motion.img
+          src={splash.archTall}
+          alt=""
+          className="absolute inset-0 h-full w-full scale-105 object-cover sm:hidden"
+          animate={entering ? { scale: 4.4, opacity: 0 } : { scale: 1.05, opacity: 1 }}
+          transition={entering ? ZOOM : REST}
+        />
+      </motion.div>
+
+      {/* 4 — scrims so the type reads over the bright snow */}
       <div
         className="pointer-events-none absolute inset-x-0 top-0 h-[44%]"
         style={{
