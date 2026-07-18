@@ -20,11 +20,19 @@ export default function Hero() {
 
   return (
     <section ref={ref} id="top" className="relative h-svh w-full overflow-hidden">
+      {/* Responsive background — must match the splash's (wide desktop / tall
+          mobile) so the hand-off from the portal is seamless with no jump. */}
       <motion.img
         src={hero.image}
         alt="Jesse and Francesca"
         style={{ y: bgY, scale: bgScale }}
-        className="absolute inset-0 h-full w-full object-cover"
+        className="absolute inset-0 hidden h-full w-full object-cover sm:block"
+      />
+      <motion.img
+        src={hero.imageTall}
+        alt="Jesse and Francesca"
+        style={{ y: bgY, scale: bgScale }}
+        className="absolute inset-0 h-full w-full object-cover sm:hidden"
       />
       {/* top scrim so the names read over the sky */}
       <div

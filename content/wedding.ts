@@ -60,8 +60,10 @@ export const decoTrees = {
 };
 
 export const hero = {
-  // The revealed proposal scene — continues seamlessly from the splash.
+  // The revealed proposal scene — continues seamlessly from the splash, so it
+  // must match the splash's responsive background (wide on desktop, tall on mobile).
   image: "/photos/winter-bg.webp",
+  imageTall: "/photos/winter-bg-tall.webp",
   scrollHint: "scroll to explore",
 };
 
