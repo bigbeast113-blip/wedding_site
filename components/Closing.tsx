@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { closing, couple } from "@/content/wedding";
+import { closing, couple, rsvp } from "@/content/wedding";
 import Blizzard from "./Blizzard";
 
 export default function Closing({ onRsvp }: { onRsvp: () => void }) {
@@ -35,17 +35,31 @@ export default function Closing({ onRsvp }: { onRsvp: () => void }) {
           {closing.line}
         </motion.p>
 
-        <motion.button
-          onClick={onRsvp}
-          className="mt-10 rounded-full bg-rust px-8 py-3 text-sm font-medium uppercase tracking-[0.2em] text-white transition-colors hover:bg-rust-dark"
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          whileHover={{ scale: 1.04 }}
-        >
-          Submit RSVP
-        </motion.button>
+        {rsvp.enabled ? (
+          <motion.button
+            onClick={onRsvp}
+            className="mt-10 rounded-full bg-rust px-8 py-3 text-sm font-medium uppercase tracking-[0.2em] text-white transition-colors hover:bg-rust-dark"
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            whileHover={{ scale: 1.04 }}
+          >
+            Submit RSVP
+          </motion.button>
+        ) : (
+          <motion.button
+            disabled
+            title="RSVP opens closer to the date"
+            className="mt-10 cursor-not-allowed rounded-full bg-white/20 px-8 py-3 text-sm font-medium uppercase tracking-[0.2em] text-white/60 backdrop-blur-sm"
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          >
+            RSVP · Coming Soon
+          </motion.button>
+        )}
 
         <div className="absolute bottom-8 text-xs uppercase tracking-[0.35em] text-white/70">
           {couple.names} · {couple.dateDisplay}

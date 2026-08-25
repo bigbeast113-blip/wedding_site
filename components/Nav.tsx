@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { nav, couple } from "@/content/wedding";
+import { nav, couple, rsvp } from "@/content/wedding";
 import { usePageTransition } from "./PageTransition";
 
 export default function Nav({ onRsvp }: { onRsvp: () => void }) {
@@ -36,12 +36,22 @@ export default function Nav({ onRsvp }: { onRsvp: () => void }) {
           </button>
         </div>
 
-        <button
-          onClick={onRsvp}
-          className="rounded-full bg-rust px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-rust-dark"
-        >
-          {nav.cta}
-        </button>
+        {rsvp.enabled ? (
+          <button
+            onClick={onRsvp}
+            className="rounded-full bg-rust px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-rust-dark"
+          >
+            {nav.cta}
+          </button>
+        ) : (
+          <button
+            disabled
+            title="RSVP opens closer to the date"
+            className="cursor-not-allowed rounded-full bg-stone/40 px-5 py-2 text-sm font-medium text-white/70"
+          >
+            RSVP · Coming Soon
+          </button>
+        )}
       </nav>
     </motion.header>
   );

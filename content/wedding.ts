@@ -127,6 +127,7 @@ export type DetailCard = {
   // Rich modal body — array of blocks
   modal: {
     intro: string;
+    note?: string; // optional highlighted callout (e.g. "call to book for the discount")
     sections?: { heading: string; items: { name: string; desc?: string }[] }[];
     links?: { label: string; url: string }[];
     hotels?: { name: string; desc: string; url: string; image?: string }[];
@@ -179,7 +180,9 @@ export const details = {
         "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=900&q=80",
       modal: {
         intro:
-          "Where to stay for the weekend. We have room blocks at the resort, plus a nearby budget-friendly option. Tap any hotel to book.",
+          "Where to stay for the weekend. We have room blocks at the resort, plus a nearby budget-friendly option.",
+        note:
+          "To get our group discount, please CALL the hotel to book and mention the Jesse & Francesca wedding — the discounted rate is not available when booking online.",
         hotels: [
           {
             name: "Grand Cascades Lodge",
@@ -358,6 +361,8 @@ export const closing = {
 };
 
 export const rsvp = {
+  // Set to false to grey out / disable the RSVP buttons site-wide until RSVPs open.
+  enabled: false,
   // Paste your deployed Google Apps Script web-app URL here to save responses
   // to a Google Sheet. Leave "" and the form just shows a thank-you (no save).
   endpoint: "https://script.google.com/macros/s/AKfycbx0S63aL06cVg2MW-LlXs2XWB-3uhgKRpzkUzHuneHC-vlLdbvQcWhgOvXUu3-VfGM/exec",

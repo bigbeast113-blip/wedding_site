@@ -77,6 +77,13 @@ function Modal({ card, onClose }: { card: DetailCard; onClose: () => void }) {
         <h2 className="font-serif text-4xl font-semibold text-ink">{card.title}</h2>
         <p className="mt-3 leading-relaxed text-stone">{card.modal.intro}</p>
 
+        {card.modal.note && (
+          <div className="mt-4 flex items-start gap-3 rounded-xl border border-rust/30 bg-rust/10 px-4 py-3">
+            <span className="text-lg leading-none">📞</span>
+            <p className="text-sm font-medium leading-relaxed text-rust-dark">{card.modal.note}</p>
+          </div>
+        )}
+
         {card.modal.gallery &&
           (card.modal.gallery.length ? (
             <div className="mt-6 grid grid-cols-3 gap-2 sm:gap-3">
