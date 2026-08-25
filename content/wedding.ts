@@ -114,9 +114,10 @@ export const dateReveal = {
 export const countdown = {
   // Real venue: Grand Cascades Lodge in the snow.
   illustration: "/photos/Venue/mainVenueImage.webp",
-  // Clicking the venue image books a room at the lodge.
+  // Clicking the venue image opens the lodge page (for info / phone number).
   bookingUrl: "https://www.crystalgolfresort.com/stay/grand-cascades-lodge",
-  bookingCta: "Book your stay at Grand Cascades Lodge",
+  bookingCta: "See Grand Cascades Lodge",
+  note: "To get our group discount, please call the hotel to book and mention the Jesse & Francesca wedding — the discounted rate is not available when booking online.",
 };
 
 export type DetailCard = {

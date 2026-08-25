@@ -82,9 +82,10 @@ export default function Countdown() {
           </span>
         </div>
       </motion.a>
-      <p className="mt-4 text-xs uppercase tracking-[0.3em] text-stone">
-        click the lodge to book your room
-      </p>
+      <div className="mx-auto mt-6 flex max-w-2xl items-start gap-3 rounded-xl border border-rust/30 bg-rust/10 px-5 py-4 text-left">
+        <span className="text-xl leading-none">📞</span>
+        <p className="text-sm font-medium leading-relaxed text-rust-dark">{countdown.note}</p>
+      </div>
     </section>
   );
 }
