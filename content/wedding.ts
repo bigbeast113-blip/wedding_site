@@ -270,7 +270,7 @@ export const faq = {
   heading: "Questions and answers",
   helpLead: "Can’t find the answer here?",
   helpLinkLabel: "Reach out to Jesse or Francesca",
-  helpLinkHref: "mailto:hello@example.com",
+  helpLinkHref: "mailto:fprimiani712@gmail.com",
   items: [
     {
       q: "When should I RSVP by?",
