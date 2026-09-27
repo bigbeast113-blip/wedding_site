@@ -82,7 +82,6 @@ export default function Faq() {
 
   return (
     <section id="faq" className="relative overflow-hidden bg-ivory px-6 py-28 md:py-40">
-      <Sparkles count={14} />
       <DecoTree src={decoTrees.frost} side="left" width="clamp(115px, 14vw, 210px)" opacity={0.5} />
       <div className="relative mx-auto grid max-w-6xl grid-cols-1 gap-12 md:grid-cols-[0.95fr_1.5fr] md:gap-20">
         <div className="md:sticky md:top-32 md:self-start">
@@ -111,6 +110,8 @@ export default function Faq() {
           ))}
         </div>
       </div>
+      {/* last = drawn over the content (tiny, click-through) */}
+      <Sparkles count={14} />
     </section>
   );
 }

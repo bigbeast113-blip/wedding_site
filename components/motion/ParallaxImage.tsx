@@ -79,7 +79,7 @@ export default function ParallaxImage({
             loading="lazy"
             decoding="async"
             style={{ y, scale: 1 + speed * 2.4 }}
-            className="absolute inset-0 h-full w-full object-cover"
+            className="absolute inset-0 h-full w-full object-cover will-change-transform"
           />
         </motion.div>
       </motion.div>

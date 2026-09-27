@@ -30,11 +30,12 @@ export function DogTrot({
 
   return (
     <div ref={ref} className="pointer-events-none absolute inset-0 z-0 select-none">
-      <motion.div className="absolute bottom-2 left-0" style={{ x, opacity }}>
+      <motion.div className="absolute bottom-2 left-0 will-change-transform" style={{ x, opacity }}>
         <img
           src={src}
           alt=""
           aria-hidden
+          decoding="async"
           className={`block drop-shadow-[0_8px_8px_rgba(20,30,40,0.18)] ${flip ? "-scale-x-100" : ""}`}
           style={{ width }}
         />

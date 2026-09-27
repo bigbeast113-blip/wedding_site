@@ -32,13 +32,13 @@ export default function Hero({ returning = false }: { returning?: boolean }) {
         src={hero.image}
         alt="Jesse proposing to Francesca on a snowy mountaintop at sunset"
         style={{ y: bgY, scale: bgScale }}
-        className="absolute inset-0 hidden h-full w-full object-cover sm:block"
+        className="absolute inset-0 hidden h-full w-full object-cover will-change-transform sm:block"
       />
       <motion.img
         src={hero.imageTall}
         alt="Jesse proposing to Francesca on a snowy mountaintop at sunset"
         style={{ y: bgY, scale: bgScale }}
-        className="absolute inset-0 h-full w-full object-cover sm:hidden"
+        className="absolute inset-0 h-full w-full object-cover will-change-transform sm:hidden"
       />
 
       {/* scrims: sky legibility up top, a soft floor at the bottom */}

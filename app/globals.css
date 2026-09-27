@@ -3,8 +3,9 @@
 @tailwind utilities;
 
 :root {
-  --font-serif: "Cormorant Garamond", Georgia, serif;
-  --font-sans: "Inter", system-ui, sans-serif;
+  /* --font-serif / --font-sans come from next/font (on <html>) — don't redefine
+     them here: a plain-name copy on :root ties on specificity and, in production
+     builds, won — so headings silently fell back to Georgia. */
   --ease-expo: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -33,7 +34,7 @@ body {
   overflow-x: hidden; /* keep edge decorations from causing sideways scroll */
   background-color: #f6f1e9; /* warm ivory */
   color: theme("colors.ink");
-  font-family: var(--font-sans);
+  font-family: var(--font-sans, system-ui, sans-serif);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -51,7 +52,7 @@ body {
 
 /* Display serif helper used by big lowercase headings */
 .display {
-  font-family: var(--font-serif);
+  font-family: var(--font-serif, Georgia, serif);
   font-weight: 500;
   letter-spacing: -0.01em;
   line-height: 0.95;
@@ -93,19 +94,46 @@ body {
   background-size: 200% auto;
   animation: shimmer 7s linear infinite;
 }
-@media (prefers-reduced-motion: reduce) {
+/* phones: a static gold gradient — the moving shimmer repaints every frame */
+@media (prefers-reduced-motion: reduce), (max-width: 767px) {
   .text-gold-shimmer {
     animation: none;
   }
 }
 
 /* ── Keyframes ─────────────────────────────────────────────────────────── */
-@keyframes snowfall {
-  0% {
+/* Snowfall with the sideways drift baked in (four variants) — keyframes that
+   read per-flake CSS variables can't always run on the compositor. */
+@keyframes snowfall-a {
+  from {
     transform: translate3d(0, -5vh, 0);
   }
-  100% {
-    transform: translate3d(var(--drift, 0px), 105vh, 0);
+  to {
+    transform: translate3d(12px, 105vh, 0);
+  }
+}
+@keyframes snowfall-b {
+  from {
+    transform: translate3d(0, -5vh, 0);
+  }
+  to {
+    transform: translate3d(-12px, 105vh, 0);
+  }
+}
+@keyframes snowfall-c {
+  from {
+    transform: translate3d(0, -5vh, 0);
+  }
+  to {
+    transform: translate3d(26px, 105vh, 0);
+  }
+}
+@keyframes snowfall-d {
+  from {
+    transform: translate3d(0, -5vh, 0);
+  }
+  to {
+    transform: translate3d(-26px, 105vh, 0);
   }
 }
 
@@ -124,20 +152,30 @@ body {
   }
 }
 
-/* Stars in the night sections */
-@keyframes twinkle {
+/* Stars in the night sections: each sky twinkles as three whole layers */
+@keyframes twinkle-group {
   0%,
   100% {
-    opacity: var(--o, 0.6);
-    transform: scale(1);
+    opacity: 1;
   }
   50% {
-    opacity: 0.12;
-    transform: scale(0.7);
+    opacity: 0.3;
   }
 }
+.twinkle-group {
+  animation: twinkle-group 4s ease-in-out infinite;
+}
 
-/* Slow aurora / glow drift in the night sections */
+/* Slow aurora / glow drift in the night sections (static on phones, where
+   big animated layers cost more than the barely-visible drift is worth) */
+.aurora-glow {
+  animation: aurora 24s ease-in-out infinite;
+}
+@media (max-width: 767px) {
+  .aurora-glow {
+    animation: none;
+  }
+}
 @keyframes aurora {
   0% {
     transform: translate3d(-6%, 0, 0) scale(1);

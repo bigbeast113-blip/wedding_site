@@ -119,7 +119,7 @@ export default function FlyThrough() {
       {/* night nav styling until the bloom reaches the top of the screen (~87%) */}
       <div aria-hidden data-nav-dark className="pointer-events-none absolute inset-x-0 top-0 h-[calc(244vh+44px)]" />
       <div className="sticky top-0 h-svh overflow-hidden">
-        <motion.div className="absolute inset-0" style={{ scale: starScale }}>
+        <motion.div className="absolute inset-0 will-change-transform" style={{ scale: starScale }}>
           <NightSky stars={90} />
         </motion.div>
         {/* seamless join with the darkened hero above */}

@@ -43,18 +43,18 @@ export default function DateReveal() {
         <RevealText as="p" text={dateReveal.lead} className="font-serif text-3xl italic text-stone md:text-4xl" />
 
         <div className="mt-4 flex flex-col items-center md:mt-2 md:flex-row md:items-center md:justify-center md:gap-10">
-          <motion.span style={{ x: monthX, opacity: sideOpacity }} className="display text-6xl text-ink md:text-8xl lg:text-9xl">
+          <motion.span style={{ x: monthX, opacity: sideOpacity }} className="display text-6xl text-ink will-change-transform md:text-8xl lg:text-9xl">
             {month}
           </motion.span>
           {day && (
             <motion.span
               style={{ scale: dayScale, opacity: dayOpacity, rotate: dayRotate }}
-              className="display text-gold-deep text-gold-shimmer block px-2 text-[46vw] leading-[0.8] md:text-[17rem] lg:text-[21rem]"
+              className="display text-gold-deep text-gold-shimmer block px-2 will-change-transform text-[46vw] leading-[0.8] md:text-[17rem] lg:text-[21rem]"
             >
               {day}
             </motion.span>
           )}
-          <motion.span style={{ x: yearX, opacity: sideOpacity }} className="display text-6xl text-ink md:text-8xl lg:text-9xl">
+          <motion.span style={{ x: yearX, opacity: sideOpacity }} className="display text-6xl text-ink will-change-transform md:text-8xl lg:text-9xl">
             {year}
           </motion.span>
         </div>

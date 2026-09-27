@@ -236,19 +236,14 @@ export const details = {
         sections: [
           {
             heading: "Cocktail Hour",
-            items: [
-              {
-                name: "Passed Canapes",
-                desc: "Seasonal tartlet with whipped goat cheese and herbs. Crispy prawn skewer with citrus aioli.",
-              },
-            ],
+            items: [{ name: "Hors d’oeuvres", desc: "TBD" }],
           },
           {
             heading: "Dinner",
             items: [
-              { name: "First Course", desc: "Garden greens, shaved vegetables, lemon vinaigrette" },
-              { name: "Main", desc: "Choice of beef, fish, or a seasonal vegetarian plate" },
-              { name: "Dessert", desc: "A little surprise from the kitchen" },
+              { name: "First Course", desc: "TBD" },
+              { name: "Main", desc: "TBD" },
+              { name: "Dessert", desc: "TBD" },
             ],
           },
         ],

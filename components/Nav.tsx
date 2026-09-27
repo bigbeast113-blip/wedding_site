@@ -93,12 +93,14 @@ export default function Nav({ onRsvp }: { onRsvp: () => void }) {
           transition={{ duration: 0.7, ease: EXPO }}
         >
           <nav
-            className={`flex items-center justify-between gap-4 rounded-full border px-5 py-2.5 backdrop-blur-md transition-all duration-700 ${
+            className={`flex items-center justify-between gap-4 rounded-full border px-5 py-2.5 transition-all duration-700 md:backdrop-blur-md ${
+              // phones skip the frosted blur (re-blurring on every scroll frame is costly)
+              // and get a slightly more solid pill instead
               dark
-                ? "border-white/10 bg-night/70 shadow-[0_10px_40px_rgba(0,0,0,0.35)]"
+                ? "border-white/10 bg-night/90 shadow-[0_10px_40px_rgba(0,0,0,0.35)] md:bg-night/70"
                 : scrolled
-                  ? "border-black/5 bg-ivory-2/90 shadow-[0_10px_40px_rgba(11,20,32,0.12)]"
-                  : "border-white/20 bg-ivory-2/75 shadow-[0_8px_30px_rgba(0,0,0,0.08)]"
+                  ? "border-black/5 bg-ivory-2/95 shadow-[0_10px_40px_rgba(11,20,32,0.12)] md:bg-ivory-2/90"
+                  : "border-white/20 bg-ivory-2/90 shadow-[0_8px_30px_rgba(0,0,0,0.08)] md:bg-ivory-2/75"
             }`}
           >
             <a

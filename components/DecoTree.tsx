@@ -42,7 +42,7 @@ export default function DecoTree({
       whileInView={{ opacity }}
       viewport={{ once: false, amount: 0.05 }}
       transition={{ duration: 0.9, ease: "easeOut" }}
-      className={`pointer-events-none absolute z-0 select-none drop-shadow-[0_8px_16px_rgba(20,30,40,0.18)] ${sidePos}`}
+      className={`pointer-events-none absolute z-0 select-none drop-shadow-[0_8px_16px_rgba(20,30,40,0.18)] will-change-transform ${sidePos}`}
     />
   );
 }

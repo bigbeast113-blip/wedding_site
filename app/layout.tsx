@@ -39,7 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SmoothScroll />
         <TransitionProvider>
           <LightboxProvider>
-            <Snow count={48} />
+            <Snow count={32} />
             {children}
             <Cursor />
           </LightboxProvider>

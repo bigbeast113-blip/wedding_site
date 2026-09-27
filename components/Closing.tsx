@@ -52,7 +52,7 @@ export default function Closing({ onRsvp }: { onRsvp: () => void }) {
             src={mobile ? closing.imageTall : closing.image}
             alt="Jesse and Francesca with their dogs"
             style={{ scale: imgScale }}
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover will-change-transform"
           />
           <motion.div style={{ opacity: dim }} className="absolute inset-0 bg-night" />
         </motion.div>
@@ -78,7 +78,7 @@ export default function Closing({ onRsvp }: { onRsvp: () => void }) {
             <button
               disabled
               title="RSVP opens closer to the date"
-              className="mt-12 cursor-not-allowed rounded-full border border-white/25 bg-white/10 px-9 py-3.5 text-xs font-medium uppercase tracking-[0.25em] text-white/65 backdrop-blur-sm"
+              className="mt-12 cursor-not-allowed rounded-full border border-white/25 bg-white/10 px-9 py-3.5 text-xs font-medium uppercase tracking-[0.25em] text-white/65 md:backdrop-blur-sm"
             >
               RSVP · Coming Soon
             </button>

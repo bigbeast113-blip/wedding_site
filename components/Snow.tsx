@@ -7,7 +7,8 @@ import { motion, useScroll, useVelocity, useTransform, useSpring } from "framer-
  * Full-page falling snow. Fixed and pointer-events-none so it drifts over all
  * content as you scroll, but never blocks clicks (z-40, below modals). The
  * whole field blows sideways based on scroll velocity, so fast scrolling kicks
- * up a windy flurry.
+ * up a windy flurry. Every other flake is skipped on phones, and the field is
+ * one GPU layer that the wind simply moves.
  */
 export default function Snow({ count = 60 }: { count?: number }) {
   const { scrollY } = useScroll();
@@ -24,30 +25,29 @@ export default function Snow({ count = 60 }: { count?: number }) {
         const size = 2 + (i % 5) * 1.4;
         const duration = 9 + (i % 7) * 2.2;
         const delay = -((i * 1.7) % duration); // negative = already mid-fall on load
-        const drift = (i % 2 === 0 ? 1 : -1) * (8 + (i % 4) * 6);
         const opacity = 0.4 + (i % 5) * 0.12;
-        return { left, size, duration, delay, drift, opacity };
+        return { left, size, duration, delay, opacity, variant: "acbd"[i % 4] };
       }),
     [count]
   );
 
   return (
     <motion.div
-      className="pointer-events-none fixed top-0 left-[-20vw] z-40 h-full w-[140vw] overflow-hidden"
+      className="pointer-events-none fixed top-0 left-[-20vw] z-40 h-full w-[140vw] overflow-hidden will-change-transform"
       style={{ x: wind, skewX: skew }}
     >
       {flakes.map((f, i) => (
         <span
           key={i}
-          className="absolute top-[-5vh] block rounded-full bg-white"
+          className={`absolute top-[-5vh] block rounded-full ${i % 2 ? "max-md:hidden" : ""}`}
           style={{
             left: `${f.left}%`,
             width: f.size,
             height: f.size,
             opacity: f.opacity,
-            boxShadow: "0 0 4px rgba(255,255,255,0.7)",
-            animation: `snowfall ${f.duration}s linear ${f.delay}s infinite`,
-            ["--drift" as string]: `${f.drift}px`,
+            // soft edge without a box-shadow (shadows enlarge every flake's layer)
+            background: "radial-gradient(circle, #fff 55%, rgba(255,255,255,0) 75%)",
+            animation: `snowfall-${f.variant} ${f.duration}s linear ${f.delay}s infinite`,
           }}
         />
       ))}

@@ -60,7 +60,7 @@ export default function RevealText({
         className="inline-block overflow-hidden align-bottom"
         style={{ paddingBottom: "0.14em", marginBottom: "-0.14em", paddingRight: "0.05em", marginRight: "-0.05em" }}
       >
-        <motion.span className={`inline-block will-change-transform ${extra}`} variants={item} custom={c}>
+        <motion.span className={`inline-block ${extra}`} variants={item} custom={c}>
           {content}
         </motion.span>
       </span>

@@ -4,7 +4,8 @@ import { useMemo } from "react";
 
 /**
  * Tiny champagne-gold flecks drifting down — the ivory sections' answer to
- * the snowfall in the night sections. Deterministic layout, pure CSS.
+ * the snowfall in the night sections. Deterministic layout, pure CSS; phones
+ * get every other fleck (each one is its own animated layer).
  */
 export default function Sparkles({ count = 24 }: { count?: number }) {
   const flecks = useMemo(
@@ -26,7 +27,7 @@ export default function Sparkles({ count = 24 }: { count?: number }) {
         <span
           key={i}
           data-deco-anim
-          className="absolute top-0 block rotate-45"
+          className={`absolute top-0 block rotate-45 ${i % 2 ? "max-md:hidden" : ""}`}
           style={{
             left: `${f.left}%`,
             width: f.size,

@@ -114,7 +114,7 @@ export default function Countdown() {
               <p className="display mt-2 text-4xl text-white md:text-6xl">{couple.venue}</p>
               <p className="mt-1 text-sm text-white/70">{couple.city}</p>
             </div>
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-5 py-2.5 text-xs font-medium uppercase tracking-[0.2em] text-white backdrop-blur-sm transition-colors duration-500 group-hover:border-gold-light group-hover:bg-gold-light group-hover:text-night">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-5 py-2.5 text-xs font-medium uppercase tracking-[0.2em] text-white md:backdrop-blur-sm transition-colors duration-500 group-hover:border-gold-light group-hover:bg-gold-light group-hover:text-night">
               {countdown.bookingCta}
               <span className="transition-transform duration-500 group-hover:translate-x-1">→</span>
             </span>

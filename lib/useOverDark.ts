@@ -3,36 +3,33 @@
 import { useEffect, useState } from "react";
 
 /**
- * True while a horizontal line `probe` px from the top of the viewport (the
- * middle of the floating nav) sits over an element marked `data-nav-dark`, so
- * the nav can switch to its night styling instead of turning a muddy grey.
+ * True while the strip of screen where the floating nav sits (about 5% from
+ * the top) is over an element marked `data-nav-dark`, so the nav can switch
+ * to its night styling instead of turning a muddy grey.
+ *
+ * An IntersectionObserver reports only the moments that changes — no
+ * measuring the page on every scroll frame. Marked elements must be on the
+ * page when the nav mounts (they are: nav and sections render together).
  */
-export function useOverDark(probe = 44) {
+export function useOverDark() {
   const [dark, setDark] = useState(false);
 
   useEffect(() => {
-    let raf = 0;
-    const check = () => {
-      raf = 0;
-      let over = false;
-      document.querySelectorAll<HTMLElement>("[data-nav-dark]").forEach((el) => {
-        const r = el.getBoundingClientRect();
-        if (r.top <= probe && r.bottom > probe) over = true;
-      });
-      setDark(over);
-    };
-    const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(check);
-    };
-    check();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-      cancelAnimationFrame(raf);
-    };
-  }, [probe]);
+    const over = new Set<Element>();
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) over.add(e.target);
+          else over.delete(e.target);
+        }
+        setDark(over.size > 0);
+      },
+      // shrink the viewport to a thin band 5–6% from the top
+      { rootMargin: "-5% 0px -94% 0px" }
+    );
+    document.querySelectorAll("[data-nav-dark]").forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
 
   return dark;
 }

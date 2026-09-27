@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion, useInView, useScroll, useTransform, type MotionValue } from "framer-motion";
 import { story, type Chapter } from "@/content/wedding";
 import RevealText, { EXPO } from "./motion/RevealText";
@@ -18,7 +18,9 @@ const STORY_PHOTOS = story.chapters.flatMap((c) => c.photos);
 const NUM = ["one", "two", "three", "four", "five", "six"];
 
 function useIsMobile() {
-  const [m, setM] = useState(false);
+  // read the width up front (this section only renders in the browser, after
+  // the splash) so the first layout is already the right one
+  const [m, setM] = useState(() => typeof window !== "undefined" && window.innerWidth < 768);
   useEffect(() => {
     const f = () => setM(window.innerWidth < 768);
     f();
@@ -28,12 +30,26 @@ function useIsMobile() {
   return m;
 }
 
+// Remembered for the session: coming back to the page lays the reel out at
+// its final size straight away (so a restored scroll position lands true).
+const ASPECTS = new Map<string, number>();
+
 /** Natural aspect ratio (w/h) of an image, so frames never crop awkwardly. */
 function useAspect(src: string, fallback = 0.8) {
-  const [a, setA] = useState(fallback);
+  const [a, setA] = useState(() => ASPECTS.get(src) ?? fallback);
   useEffect(() => {
+    const known = ASPECTS.get(src);
+    if (known) {
+      setA(known);
+      return;
+    }
     const img = new Image();
-    img.onload = () => img.naturalHeight && setA(img.naturalWidth / img.naturalHeight);
+    img.onload = () => {
+      if (!img.naturalHeight) return;
+      const r = img.naturalWidth / img.naturalHeight;
+      ASPECTS.set(src, r);
+      setA(r);
+    };
     img.src = src;
   }, [src]);
   return a;
@@ -82,7 +98,7 @@ function Photo({
             alt=""
             decoding="async"
             style={{ x: drift, scale: 1.16 }}
-            className="absolute inset-0 h-full w-full object-cover"
+            className="absolute inset-0 h-full w-full object-cover will-change-transform"
           />
         </span>
       </motion.button>
@@ -183,7 +199,8 @@ export default function Story() {
   const [height, setHeight] = useState<number | null>(null);
   const mobile = useIsMobile();
 
-  useEffect(() => {
+  // measured before the first paint, so the page never shows a wrong height
+  useLayoutEffect(() => {
     const measure = () => {
       const track = trackRef.current;
       if (!track) return;

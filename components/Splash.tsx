@@ -29,8 +29,7 @@ export default function Splash({ onEnter }: { onEnter: () => void }) {
         const size = 2 + (i % 4) * 1.5;
         const dur = 8 + (i % 6) * 2;
         const delay = -((i * 1.9) % dur);
-        const drift = (i % 2 ? 1 : -1) * (10 + (i % 4) * 8);
-        return { left, size, dur, delay, drift, op: 0.35 + (i % 4) * 0.12 };
+        return { left, size, dur, delay, op: 0.35 + (i % 4) * 0.12 };
       }),
     []
   );
@@ -122,8 +121,7 @@ export default function Splash({ onEnter }: { onEnter: () => void }) {
               height: f.size,
               opacity: f.op,
               boxShadow: "0 0 4px rgba(255,255,255,0.7)",
-              animation: `snowfall ${f.dur}s linear ${f.delay}s infinite`,
-              ["--drift" as string]: `${f.drift}px`,
+              animation: `snowfall-${"badc"[i % 4]} ${f.dur}s linear ${f.delay}s infinite`,
             }}
           />
         ))}

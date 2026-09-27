@@ -21,10 +21,10 @@ export function SubNav() {
       transition={{ duration: 0.9, delay: 0.3, ease: EXPO }}
     >
       <nav
-        className={`flex w-full max-w-5xl items-center justify-between gap-4 rounded-full border px-5 py-2.5 backdrop-blur-md transition-all duration-700 ${
+        className={`flex w-full max-w-5xl items-center justify-between gap-4 rounded-full border px-5 py-2.5 transition-all duration-700 md:backdrop-blur-md ${
           dark
-            ? "border-white/10 bg-night/70 shadow-[0_10px_40px_rgba(0,0,0,0.35)]"
-            : "border-black/5 bg-ivory-2/90 shadow-[0_10px_40px_rgba(11,20,32,0.12)]"
+            ? "border-white/10 bg-night/90 shadow-[0_10px_40px_rgba(0,0,0,0.35)] md:bg-night/70"
+            : "border-black/5 bg-ivory-2/95 shadow-[0_10px_40px_rgba(11,20,32,0.12)] md:bg-ivory-2/90"
         }`}
       >
         <button

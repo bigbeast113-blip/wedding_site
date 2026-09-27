@@ -11,6 +11,7 @@ import {
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { saveHomeSpot } from "@/lib/scroll";
 
 type Phase = "idle" | "cover" | "reveal";
 
@@ -27,6 +28,8 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
   const go = useCallback(
     (href: string) => {
       if (phase !== "idle" || href === pathname) return;
+      // leaving the home page: note the exact spot so "back" returns here
+      if (pathname === "/") saveHomeSpot(true);
       target.current = href;
       setPhase("cover");
     },
