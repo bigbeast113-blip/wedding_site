@@ -1,37 +1,70 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { details, DetailCard } from "@/content/wedding";
-import Blizzard from "./Blizzard";
+import { useRef, useState } from "react";
+import { motion, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
+import { details, type DetailCard } from "@/content/wedding";
 import { usePageTransition } from "./PageTransition";
-import { useLightbox } from "./Lightbox";
 import { useDialog } from "@/lib/useDialog";
+import RevealText, { EXPO } from "./motion/RevealText";
+import { PhoneIcon, SnowflakeIcon } from "./Icons";
 
-function Card({ card, onOpen }: { card: DetailCard; onOpen: () => void }) {
+// Bento placement: the first card is the wide hero tile.
+const ORDER = ["travel-logistics", "wedding-parties", "registry", "dinner-menu", "gallery"];
+const SIZE: Record<string, string> = {
+  "travel-logistics": "md:col-span-2 md:h-[440px]",
+  "wedding-parties": "md:col-span-1 md:h-[440px]",
+};
+
+function Card({ card, index, onOpen }: { card: DetailCard; index: number; onOpen: () => void }) {
+  const ref = useRef<HTMLButtonElement>(null);
+  const rx = useMotionValue(0);
+  const ry = useMotionValue(0);
+  const srx = useSpring(rx, { stiffness: 160, damping: 18 });
+  const sry = useSpring(ry, { stiffness: 160, damping: 18 });
+
+  function onMove(e: React.MouseEvent) {
+    const r = ref.current?.getBoundingClientRect();
+    if (!r) return;
+    ry.set(((e.clientX - r.left) / r.width - 0.5) * 7);
+    rx.set(-((e.clientY - r.top) / r.height - 0.5) * 7);
+  }
+  function onLeave() {
+    rx.set(0);
+    ry.set(0);
+  }
+
   return (
     <motion.button
+      ref={ref}
+      type="button"
       onClick={onOpen}
-      className="group relative h-56 overflow-hidden rounded-2xl text-left shadow-md"
-      initial={{ opacity: 0, y: 30 }}
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+      style={{ rotateX: srx, rotateY: sry, transformPerspective: 1000 }}
+      initial={{ opacity: 0, y: 70 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.3 }}
-      transition={{ duration: 0.6 }}
-      whileHover={{ y: -4 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 1.2, delay: (index % 3) * 0.1, ease: EXPO }}
+      className={`group relative h-[300px] overflow-hidden rounded-2xl text-left shadow-[0_24px_60px_rgba(28,26,23,0.16)] md:h-[330px] ${SIZE[card.id] ?? ""}`}
     >
       <img
         src={card.image}
         alt=""
-        className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+        loading="lazy"
+        className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1600ms] ease-expo group-hover:scale-[1.08]"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-5">
-        <div>
-          <h3 className="font-serif text-2xl font-semibold text-white">{card.title}</h3>
-          <p className="mt-1 max-w-[80%] text-sm text-white/80">{card.blurb}</p>
-        </div>
-        <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-white/90 text-xl text-ink transition-colors group-hover:bg-rust group-hover:text-white">
-          +
+      <div className="absolute inset-0 bg-gradient-to-t from-night/90 via-night/30 to-night/0 transition-opacity duration-700 group-hover:opacity-95" />
+      <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/10 transition duration-700 group-hover:ring-gold-light/60" />
+      {/* light sweep on hover */}
+      <div className="pointer-events-none absolute -inset-y-10 -left-1/2 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/15 to-transparent opacity-0 transition-all duration-[1200ms] ease-expo group-hover:left-[120%] group-hover:opacity-100" />
+
+      <div className="absolute inset-x-0 bottom-0 p-6 md:p-8">
+        <p className="text-[0.6rem] uppercase tracking-[0.45em] text-gold-light">{String(index + 1).padStart(2, "0")}</p>
+        <h3 className="display mt-2 text-[2.1rem] text-white md:text-5xl">{card.title}</h3>
+        <p className="mt-2 max-w-sm text-sm text-white/75">{card.blurb}</p>
+        <span className="mt-4 inline-flex items-center gap-2 text-[0.64rem] uppercase tracking-[0.32em] text-white/90">
+          explore
+          <span className="inline-block transition-transform duration-500 ease-expo group-hover:translate-x-2">→</span>
         </span>
       </div>
     </motion.button>
@@ -39,11 +72,11 @@ function Card({ card, onOpen }: { card: DetailCard; onOpen: () => void }) {
 }
 
 function Modal({ card, onClose }: { card: DetailCard; onClose: () => void }) {
-  const openLightbox = useLightbox();
   useDialog(true, onClose); // lock scroll + Escape while the modal is mounted
   return (
     <motion.div
-      className="fixed inset-0 z-[90] flex items-start justify-center overflow-y-auto overscroll-contain bg-black/40 p-4 backdrop-blur-sm sm:p-10"
+      data-lenis-prevent
+      className="fixed inset-0 z-[90] flex items-start justify-center overflow-y-auto overscroll-contain bg-night/60 p-4 backdrop-blur-md sm:p-10"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -53,124 +86,102 @@ function Modal({ card, onClose }: { card: DetailCard; onClose: () => void }) {
         role="dialog"
         aria-modal="true"
         aria-label={card.title}
-        className="relative w-full max-w-2xl rounded-2xl bg-paper p-6 shadow-2xl sm:p-10"
-        initial={{ opacity: 0, y: 40, scale: 0.98 }}
+        className="relative w-full max-w-2xl overflow-hidden rounded-3xl bg-ivory-2 shadow-2xl"
+        initial={{ opacity: 0, y: 60, scale: 0.97 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 40, scale: 0.98 }}
-        transition={{ type: "spring", damping: 26, stiffness: 280 }}
+        transition={{ duration: 0.7, ease: EXPO }}
         onClick={(e) => e.stopPropagation()}
       >
-        <button
-          onClick={onClose}
-          className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full text-2xl text-stone transition-colors hover:bg-black/5 hover:text-ink"
-          aria-label="Close"
-        >
-          ×
-        </button>
+        <div className="relative h-60 overflow-hidden sm:h-72">
+          <motion.img
+            src={card.image}
+            alt=""
+            className="h-full w-full object-cover"
+            initial={{ scale: 1.15 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 1.4, ease: EXPO }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-ivory-2 via-ivory-2/10 to-transparent" />
+          <button
+            onClick={onClose}
+            className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/80 text-2xl text-ink shadow backdrop-blur transition-colors hover:bg-white"
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </div>
 
-        <img
-          src={card.image}
-          alt=""
-          className="mb-6 h-56 w-full rounded-xl object-cover"
-        />
+        <div className="relative px-6 pb-8 sm:px-10 sm:pb-10">
+          <h2 className="display -mt-6 text-5xl text-ink">{card.title}</h2>
+          <p className="mt-3 leading-relaxed text-stone">{card.modal.intro}</p>
 
-        <h2 className="font-serif text-4xl font-semibold text-ink">{card.title}</h2>
-        <p className="mt-3 leading-relaxed text-stone">{card.modal.intro}</p>
-
-        {card.modal.note && (
-          <div className="mt-4 flex items-start gap-3 rounded-xl border border-rust/30 bg-rust/10 px-4 py-3">
-            <span className="text-lg leading-none">📞</span>
-            <p className="text-sm font-medium leading-relaxed text-rust-dark">{card.modal.note}</p>
-          </div>
-        )}
-
-        {card.modal.gallery &&
-          (card.modal.gallery.length ? (
-            <div className="mt-6 grid grid-cols-3 gap-2 sm:gap-3">
-              {card.modal.gallery.map((src, i) => (
-                <button
-                  key={src}
-                  onClick={() => openLightbox(src)}
-                  aria-label={`View photo ${i + 1} full screen`}
-                  className="group relative aspect-square overflow-hidden rounded-lg"
-                >
-                  <img
-                    src={src}
-                    alt=""
-                    loading="lazy"
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                </button>
-              ))}
+          {card.modal.note && (
+            <div className="mt-5 flex items-start gap-3 rounded-xl border border-gold/40 bg-gold/10 px-4 py-3">
+              <PhoneIcon className="mt-0.5 h-4 w-4 flex-none text-gold-dark" />
+              <p className="text-sm font-medium leading-relaxed text-gold-dark">{card.modal.note}</p>
             </div>
-          ) : (
-            <p className="mt-6 rounded-xl bg-cream px-4 py-8 text-center text-sm text-stone">
-              Our engagement photos will live here soon — check back closer to the day. 📸
-            </p>
+          )}
+
+          {card.modal.sections?.map((s) => (
+            <div key={s.heading} className="mt-7">
+              <h4 className="text-[0.66rem] uppercase tracking-[0.35em] text-gold-dark">{s.heading}</h4>
+              <ul className="mt-3 space-y-3">
+                {s.items.map((it) => (
+                  <li key={it.name}>
+                    <p className="font-serif text-xl text-ink">{it.name}</p>
+                    {it.desc && <p className="text-sm text-stone">{it.desc}</p>}
+                  </li>
+                ))}
+              </ul>
+            </div>
           ))}
 
-        {card.modal.sections?.map((s) => (
-          <div key={s.heading} className="mt-6">
-            <h4 className="text-xs uppercase tracking-[0.25em] text-rust-dark">{s.heading}</h4>
-            <ul className="mt-3 space-y-3">
-              {s.items.map((it) => (
-                <li key={it.name}>
-                  <p className="font-serif text-lg text-ink">{it.name}</p>
-                  {it.desc && <p className="text-sm text-stone">{it.desc}</p>}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-
-        {card.modal.hotels && (
-          <div className="mt-6 space-y-4">
-            {card.modal.hotels.map((h) => (
-              <a
-                key={h.name}
-                href={h.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex items-center gap-4 rounded-xl border border-ink/10 bg-white/60 p-3 transition-colors hover:border-rust hover:bg-white"
-              >
-                {h.image ? (
-                  <img
-                    src={h.image}
-                    alt={h.name}
-                    className="h-20 w-28 flex-none rounded-lg object-cover"
-                  />
-                ) : (
-                  <div className="flex h-20 w-28 flex-none items-center justify-center rounded-lg bg-cream font-serif text-3xl text-stone">
-                    ⛄
+          {card.modal.hotels && (
+            <div className="mt-6 space-y-4">
+              {card.modal.hotels.map((h) => (
+                <a
+                  key={h.name}
+                  href={h.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex items-center gap-4 rounded-2xl border border-ink/10 bg-white/70 p-3 transition-all duration-500 hover:border-gold/60 hover:bg-white hover:shadow-lg"
+                >
+                  {h.image ? (
+                    <img src={h.image} alt={h.name} className="h-20 w-28 flex-none rounded-xl object-cover" />
+                  ) : (
+                    <div className="flex h-20 w-28 flex-none items-center justify-center rounded-xl bg-gradient-to-br from-ivory-3 to-[#e2d2b3] text-gold-dark">
+                      <SnowflakeIcon className="h-8 w-8" />
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <p className="font-serif text-xl text-ink">{h.name}</p>
+                    <p className="text-sm text-stone">{h.desc}</p>
+                    <span className="mt-1 inline-block text-[0.66rem] font-medium uppercase tracking-[0.25em] text-gold-dark">
+                      Hotel details <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
+                    </span>
                   </div>
-                )}
-                <div className="min-w-0">
-                  <p className="font-serif text-lg text-ink">{h.name}</p>
-                  <p className="text-sm text-stone">{h.desc}</p>
-                  <span className="mt-1 inline-block text-xs font-medium uppercase tracking-wide text-rust-dark">
-                    Book a room →
-                  </span>
-                </div>
-              </a>
-            ))}
-          </div>
-        )}
+                </a>
+              ))}
+            </div>
+          )}
 
-        {card.modal.links && (
-          <div className="mt-6 flex flex-wrap gap-3">
-            {card.modal.links.map((l) => (
-              <a
-                key={l.label}
-                href={l.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-full border border-rust px-5 py-2 text-sm text-rust-dark transition-colors hover:bg-rust hover:text-white"
-              >
-                {l.label}
-              </a>
-            ))}
-          </div>
-        )}
+          {card.modal.links && (
+            <div className="mt-7 flex flex-wrap gap-3">
+              {card.modal.links.map((l) => (
+                <a
+                  key={l.label}
+                  href={l.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-full bg-night px-6 py-3 text-xs font-medium uppercase tracking-[0.25em] text-ivory transition-colors hover:bg-gold hover:text-night"
+                >
+                  {l.label} →
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
       </motion.div>
     </motion.div>
   );
@@ -179,40 +190,46 @@ function Modal({ card, onClose }: { card: DetailCard; onClose: () => void }) {
 export default function Details() {
   const [active, setActive] = useState<DetailCard | null>(null);
   const go = usePageTransition();
+  const cards = [...details.cards].sort(
+    (a, b) => (ORDER.indexOf(a.id) + 99) % 99 - (ORDER.indexOf(b.id) + 99) % 99
+  );
 
   return (
-    <section id="details" className="section-frost relative px-6 py-24">
-      <Blizzard direction="right" tone="frost" />
-      <div className="mx-auto max-w-5xl text-center">
-        <motion.h2
-          className="display text-4xl text-ink sm:text-5xl md:text-6xl"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
-        >
-          {details.heading}
-        </motion.h2>
-        <p className="mx-auto mt-4 max-w-xl text-stone">{details.subheading}</p>
+    <section id="details" className="relative overflow-hidden bg-ivory px-5 py-28 md:py-40">
+      <div className="mx-auto max-w-6xl">
+        <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-[0.66rem] uppercase tracking-[0.5em] text-gold-dark">the details</p>
+            <RevealText as="h2" text={details.heading} className="display mt-4 max-w-3xl text-5xl text-ink md:text-7xl" />
+          </div>
+          <motion.p
+            className="max-w-sm text-stone md:text-right"
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.8 }}
+            transition={{ duration: 1, delay: 0.3, ease: EXPO }}
+          >
+            {details.subheading}
+          </motion.p>
+        </div>
+
+        <div className="mt-14 grid grid-cols-1 gap-5 md:mt-20 md:grid-cols-3 md:gap-6">
+          {cards.map((card, i) => (
+            <Card
+              key={card.id}
+              card={card}
+              index={i}
+              onOpen={() => {
+                if (card.id === "wedding-parties") go("/wedding-party");
+                else if (card.id === "gallery") go("/engagement");
+                else setActive(card);
+              }}
+            />
+          ))}
+        </div>
       </div>
 
-      <div className="mx-auto mt-12 grid max-w-5xl grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {details.cards.map((card) => (
-          <Card
-            key={card.id}
-            card={card}
-            onOpen={() => {
-              if (card.id === "wedding-parties") go("/wedding-party");
-              else if (card.id === "gallery") go("/engagement");
-              else setActive(card);
-            }}
-          />
-        ))}
-      </div>
-
-      <AnimatePresence>
-        {active && <Modal card={active} onClose={() => setActive(null)} />}
-      </AnimatePresence>
+      <AnimatePresence>{active && <Modal card={active} onClose={() => setActive(null)} />}</AnimatePresence>
     </section>
   );
 }

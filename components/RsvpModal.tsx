@@ -235,6 +235,7 @@ export default function RsvpModal({ open, onClose }: { open: boolean; onClose: (
     <AnimatePresence>
       {open && (
         <motion.div
+          data-lenis-prevent
           className="fixed inset-0 z-[95] flex items-start justify-center overflow-y-auto overscroll-contain bg-black/50 p-4 backdrop-blur-sm sm:items-center sm:p-10"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

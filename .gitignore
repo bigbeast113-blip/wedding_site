@@ -42,3 +42,6 @@ photos/layerframe*.png
 photos/layerbackground*.png
 photos/main.png
 photos/mainFull.png
+
+# typescript incremental cache
+*.tsbuildinfo

@@ -5,32 +5,101 @@
 :root {
   --font-serif: "Cormorant Garamond", Georgia, serif;
   --font-sans: "Inter", system-ui, sans-serif;
+  --ease-expo: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-html {
-  scroll-behavior: smooth;
+/* ── Smooth scroll (Lenis) ─────────────────────────────────────────────── */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: clip;
+}
+.lenis [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+/* Counted scroll lock (splash gate + modals) — also covers reduced-motion
+   visitors, who get native scrolling instead of Lenis. */
+html.scroll-locked,
+html.scroll-locked body {
+  overflow: hidden;
 }
 
 body {
   overflow-x: hidden; /* keep edge decorations from causing sideways scroll */
-}
-
-body {
-  background-color: #eaf1f6; /* cool winter fallback behind the WinterScene */
+  background-color: #f6f1e9; /* warm ivory */
   color: theme("colors.ink");
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-/* Frosted-glass content panel so the winter landscape shows through while
-   keeping text readable. Replaces the old solid cream/paper section fills. */
-.section-frost {
-  background-color: rgba(244, 248, 251, 0.7);
-  backdrop-filter: blur(7px);
-  -webkit-backdrop-filter: blur(7px);
+::selection {
+  background: rgba(200, 164, 110, 0.35);
+  color: inherit;
 }
 
+/* Light "paper" panel used by the sub-pages (was frosted glass over the old
+   illustrated background). Solid + no backdrop blur = smoother scrolling. */
+.section-frost {
+  background: linear-gradient(180deg, #f8f4ed 0%, #f6f1e9 100%);
+}
+
+/* Display serif helper used by big lowercase headings */
+.display {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 0.95;
+}
+
+/* Outlined display text (marquee) */
+.text-outline {
+  /* transparent FILL only — the stroke keeps using the text color */
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 1px currentColor;
+}
+
+/* Deeper antique-gold gradient for ivory backgrounds (keeps contrast) */
+.text-gold-deep {
+  background: linear-gradient(100deg, #6f5230 0%, #b08a4f 30%, #d9b97f 50%, #a47c45 70%, #6f5230 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Champagne-gold gradient text */
+.text-gold-grad {
+  background: linear-gradient(100deg, #b98f55 0%, #f1dcb0 40%, #c8a46e 60%, #efd7a6 85%, #b98f55 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* A slow sheen travelling across gold gradient text */
+@keyframes shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+.text-gold-shimmer {
+  background-size: 200% auto;
+  animation: shimmer 7s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .text-gold-shimmer {
+    animation: none;
+  }
+}
+
+/* ── Keyframes ─────────────────────────────────────────────────────────── */
 @keyframes snowfall {
   0% {
     transform: translate3d(0, -5vh, 0);
@@ -40,9 +109,7 @@ body {
   }
 }
 
-/* Falling petals (DateReveal). Authored here because the inline `animation:`
-   on each petal references this by name; Tailwind only emits keyframes that a
-   used `animate-*` utility references, so it must live in CSS directly. */
+/* Gently falling sparkles */
 @keyframes fall {
   0% {
     transform: translateY(-10vh) rotate(0deg);
@@ -57,16 +124,29 @@ body {
   }
 }
 
-/* Slowly drifting fog band */
-@keyframes fogdrift {
-  0% {
-    transform: translateX(-5%);
+/* Stars in the night sections */
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: var(--o, 0.6);
+    transform: scale(1);
   }
   50% {
-    transform: translateX(5%);
+    opacity: 0.12;
+    transform: scale(0.7);
+  }
+}
+
+/* Slow aurora / glow drift in the night sections */
+@keyframes aurora {
+  0% {
+    transform: translate3d(-6%, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(6%, -3%, 0) scale(1.08);
   }
   100% {
-    transform: translateX(-5%);
+    transform: translate3d(-6%, 0, 0) scale(1);
   }
 }
 
@@ -90,19 +170,12 @@ body {
   width: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: theme("colors.cream");
+  background: #efe8dc;
 }
 ::-webkit-scrollbar-thumb {
-  background: theme("colors.stone");
+  background: #b9a584;
   border-radius: 999px;
-}
-
-/* Display serif helper used by big lowercase headings */
-.display {
-  font-family: var(--font-serif);
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  line-height: 0.95;
+  border: 2px solid #efe8dc;
 }
 
 /* Hide scrollbar where a section needs a clean look */
@@ -112,4 +185,11 @@ body {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Respect "reduce motion": stop the purely decorative loops. */
+@media (prefers-reduced-motion: reduce) {
+  [data-deco-anim] {
+    animation: none !important;
+  }
 }

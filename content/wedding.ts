@@ -24,24 +24,15 @@ export const couple = {
 };
 
 export const splash = {
-  // Interactive parallax intro (see Splash.tsx), built from real transparent
-  // PNG layers (crisp edges, no fade):
-  //   backdrop  = the deep woods scene behind everything
-  //   couple    = the two of you, background removed, standing in the woods
-  //   blossom   = a sky-keyed flowering branch used to frame the edges
-  // Mouse moves the layers (parallax); clicking "Click to Enter" dives through.
-  // A single cinematic "winter portal" image (archway of frosted pines opening
-  // onto a snowy valley). Clicking enter dives THROUGH the opening.
-  // Layered "winter portal": the proposal scene sits behind two foliage layers
-  // that fly toward the viewer on enter, revealing the full background.
+  // Layered "winter portal" intro (see Splash.tsx): the proposal scene sits
+  // behind two foliage layers that fly toward the viewer on click, revealing
+  // the full background — which is also the hero, so the hand-off is seamless.
   bg: "/photos/winter-bg.webp", // BACK — the full proposal scene (revealed)
   bgTall: "/photos/winter-bg-tall.webp",
   frame: "/photos/winter-frame.webp", // FAR foliage — the archway (center cut out)
   frameTall: "/photos/winter-frame-tall.webp",
   near: "/photos/winter-near.webp", // NEAR foliage — the closest snow bank
   nearTall: "/photos/winter-near-tall.webp",
-  tagline: "an adventure to wonderland awaits",
-  cta: "Click to Enter",
 };
 
 // The pups, background removed, used as scroll animations.
@@ -64,17 +55,34 @@ export const hero = {
   // must match the splash's responsive background (wide on desktop, tall on mobile).
   image: "/photos/winter-bg.webp",
   imageTall: "/photos/winter-bg-tall.webp",
-  scrollHint: "scroll to explore",
+  eyebrow: "The wedding of",
+  scrollHint: "scroll",
 };
 
-// Photos that scatter around the names as you scroll past the hero
-export const scatterPhotos: string[] = [
-  "/photos/new/img_3477.webp",
-  "/photos/new/img_3456.webp",
-  "/photos/new/img_3458.webp",
-  "/photos/new/img_3475.webp",
-  "/photos/new/img_3482.webp",
-];
+// The 3D "fly-through": as you scroll past the hero, the camera glides forward
+// through these photos floating in the night sky. Order = near -> far.
+export const flyThrough = {
+  eyebrow: "since the very first hello",
+  heading: "a love worth celebrating",
+  photos: [
+    "/photos/gallery/eng-082.webp",
+    "/photos/gallery/eng-067.webp",
+    "/photos/gallery/eng-244.webp",
+    "/photos/gallery/eng-124.webp",
+    "/photos/gallery/eng-025.webp",
+    "/photos/gallery/eng-016.webp",
+    "/photos/gallery/eng-175.webp",
+    "/photos/gallery/eng-229.webp",
+    "/photos/gallery/eng-007.webp",
+    "/photos/gallery/eng-088.webp",
+    "/photos/gallery/eng-046.webp",
+    "/photos/gallery/eng-316.webp",
+    "/photos/gallery/eng-301.webp",
+    "/photos/gallery/eng-199.webp",
+    "/photos/gallery/eng-031.webp",
+    "/photos/gallery/eng-310.webp",
+  ],
+};
 
 export type Chapter = {
   title: string;
@@ -84,7 +92,10 @@ export type Chapter = {
 };
 
 export const story = {
+  eyebrow: "how it all began",
   heading: "our story",
+  intro: "three chapters — and counting.",
+  outro: "…and the best chapter is still being written.",
   chapters: [
     {
       title: "chapter one: how we met",
@@ -109,9 +120,13 @@ export const story = {
 
 export const dateReveal = {
   lead: "so please join us…",
+  day: "Saturday",
+  time: "four o’clock in the afternoon",
 };
 
 export const countdown = {
+  eyebrow: "the countdown is on",
+  heading: "until we say “I do”",
   // Real venue: Grand Cascades Lodge in the snow.
   illustration: "/photos/Venue/mainVenueImage.webp",
   // Clicking the venue image opens the lodge page (for info / phone number).
@@ -132,14 +147,8 @@ export type DetailCard = {
     sections?: { heading: string; items: { name: string; desc?: string }[] }[];
     links?: { label: string; url: string }[];
     hotels?: { name: string; desc: string; url: string; image?: string }[];
-    gallery?: string[];
   };
 };
-
-// Engagement-party photo album. Fill with image paths (e.g. dropped into
-// /public/photos/gallery/ or pulled from a shared Drive folder). Empty = the
-// gallery card shows a friendly "coming soon".
-export const gallery: string[] = [];
 
 export const details = {
   heading: "and now some additional details…",
@@ -150,8 +159,7 @@ export const details = {
       id: "wedding-parties",
       title: "Wedding Parties",
       blurb: "Meet our favorite people.",
-      image:
-        "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=900&q=80",
+      image: "/photos/gallery/eng-094.webp",
       modal: {
         intro:
           "The friends and family standing beside us. We could not have picked a better crew to share the day with.",
@@ -177,8 +185,7 @@ export const details = {
       id: "travel-logistics",
       title: "Travel Logistics",
       blurb: "Plan your trip and stay.",
-      image:
-        "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=900&q=80",
+      image: "/photos/Venue/mainVenueImage.webp",
       modal: {
         intro:
           "Where to stay for the weekend. We have room blocks at the resort, plus a nearby budget-friendly option.",
@@ -209,8 +216,7 @@ export const details = {
       id: "registry",
       title: "Registry",
       blurb: "Your presence is enough, but if you insist…",
-      image:
-        "https://images.unsplash.com/photo-1513201099705-a9746e1e201f?auto=format&fit=crop&w=900&q=80",
+      image: "/photos/gallery/eng-154.webp",
       modal: {
         intro:
           "Your presence is truly the only gift we need. For those who have asked, here is where we are registered.",
@@ -223,8 +229,7 @@ export const details = {
       id: "dinner-menu",
       title: "Dinner Menu",
       blurb: "A quick look at what we are serving.",
-      image:
-        "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=900&q=80",
+      image: "/photos/gallery/eng-157.webp",
       modal: {
         intro:
           "We are working with our caterer to finalize a delicious multi-course meal for everyone.",
@@ -253,21 +258,24 @@ export const details = {
       id: "gallery",
       title: "Engagement Photos",
       blurb: "A peek from our engagement photos.",
-      image: "/photos/new/img_3486.webp",
+      image: "/photos/gallery/eng-139.webp",
       modal: {
         intro: "A few of our favorite moments.",
-        gallery,
       },
     },
   ] as DetailCard[],
 };
 
 export const vision = {
+  eyebrow: "the night",
+  // Words that glow gold as the sentence lights up on scroll.
+  highlights: ["beloved", "people", "cozy", "mountain", "lodge", "unforgettable", "dance", "floor"],
   text: "The vision for the night is simple: all of our most beloved people in one place, a cozy mountain lodge, flowing drinks, and an unforgettable dance floor.",
 };
 
 export const faq = {
-  heading: "Questions and answers",
+  eyebrow: "good to know",
+  heading: "questions & answers",
   helpLead: "Can’t find the answer here?",
   helpLinkLabel: "Reach out to Jesse or Francesca",
   helpLinkHref: "mailto:fprimiani712@gmail.com",
@@ -357,7 +365,9 @@ export const weddingParty = {
 };
 
 export const closing = {
+  eyebrow: "forever starts here",
   image: "/photos/new/img_3494.webp",
+  imageTall: "/photos/gallery/eng-184.webp", // portrait version for phones
   line: "you’re my favorite person to do anything with for the rest of my life.",
 };
 
@@ -367,14 +377,6 @@ export const rsvp = {
   // Paste your deployed Google Apps Script web-app URL here to save responses
   // to a Google Sheet. Leave "" and the form just shows a thank-you (no save).
   endpoint: "https://script.google.com/macros/s/AKfycbx0S63aL06cVg2MW-LlXs2XWB-3uhgKRpzkUzHuneHC-vlLdbvQcWhgOvXUu3-VfGM/exec",
-  // Households / parties — like Zola. Each invitation is ONE entry listing
-  // everyone on it. A guest searches their name; we find their party and let
-  // them respond for each member. Leave [] for open RSVP (anyone can respond).
-  // NOTE: names here are visible in page source (fine for most weddings).
-  // Example:
-  //   { members: ["Jesse Abruzzo", "Francesca Primiani"] },
-  //   { members: ["Roger Smith", "Jane Smith", "Smith Family +2"] },
-  parties: [] as { members: string[] }[],
   // OR — pull the guest list LIVE from a Google Sheet so you can edit it anytime
   // without redeploying. Make a SEPARATE sheet, share it "Anyone with the link →
   // Viewer", and paste its ID + tab name below. Layout = TWO columns with a header
@@ -406,10 +408,19 @@ export const rsvp = {
 };
 
 export const nav = {
+  // In-page anchors (smooth-scrolled); the sub-pages are added by the Nav.
   links: [
-    { label: "Travel Logistics", href: "#details" },
-    { label: "Registry", href: "#details" },
+    { label: "Our Story", href: "#story" },
+    { label: "The Day", href: "#date" },
+    { label: "Details", href: "#details" },
     { label: "FAQ", href: "#faq" },
   ],
   cta: "Submit RSVP",
+};
+
+// The oversized band of type that drifts across the page between sections.
+export const marquee = ["Jesse & Francesca", "December 11, 2027", "Grand Cascades Lodge", "Hamburg, NJ"];
+
+export const footer = {
+  note: "made with love for our favorite people",
 };

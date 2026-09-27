@@ -1,12 +1,16 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { couple, decoTrees } from "@/content/wedding";
+import { decoTrees } from "@/content/wedding";
 import { galleryPhotos, guestbookZip } from "@/content/guestbook";
 import { usePageTransition } from "@/components/PageTransition";
 import { useLightbox } from "@/components/Lightbox";
 import DecoTree from "@/components/DecoTree";
+import Sparkles from "@/components/Sparkles";
+import { SubNav, SubHero } from "@/components/SubPage";
+import { DownloadIcon } from "@/components/Icons";
 
+// A gentle scatter of tilts so the grid feels like prints laid on a table.
 const ROT = ["-rotate-2", "rotate-1", "-rotate-1", "rotate-2", "rotate-0", "rotate-1", "-rotate-1"];
 
 export default function EngagementPage() {
@@ -14,86 +18,64 @@ export default function EngagementPage() {
   const openLightbox = useLightbox();
 
   return (
-    <main className="relative min-h-screen pb-28">
-      <motion.header
-        className="fixed inset-x-0 top-4 z-50 flex justify-center px-4"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7 }}
+    <main className="relative min-h-screen bg-ivory">
+      <SubNav />
+      <SubHero
+        eyebrow="the engagement"
+        title="engagement photos"
+        intro={`${galleryPhotos.length} of our favorite moments — tap any photo to see it up close.`}
       >
-        <nav className="flex w-full max-w-4xl items-center justify-between gap-4 rounded-full border border-black/5 bg-paper/80 px-5 py-2.5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] backdrop-blur-md">
-          <button
-            onClick={() => go("/")}
-            className="font-serif text-xl font-semibold tracking-tight text-ink"
-          >
-            {couple.monogram}
-          </button>
-          <button
-            onClick={() => go("/")}
-            className="rounded-full bg-rust px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-rust-dark"
-          >
-            ← Back to site
-          </button>
-        </nav>
-      </motion.header>
+        <a
+          href={guestbookZip}
+          download
+          className="mt-8 inline-flex items-center gap-2 rounded-full bg-gold-light px-7 py-3.5 text-xs font-medium uppercase tracking-[0.25em] text-night shadow-[0_10px_40px_rgba(230,205,157,0.3)] transition-colors hover:bg-white"
+        >
+          <DownloadIcon className="h-4 w-4" />
+          Download all photos
+        </a>
+      </SubHero>
 
-      <section className="section-frost relative px-5 pt-36 sm:px-6">
+      <section className="relative overflow-hidden px-4 pb-28 pt-6 sm:px-6">
+        <Sparkles count={16} />
         <DecoTree src={decoTrees.pineA} side="left" width="clamp(90px, 11vw, 175px)" opacity={0.4} />
         <DecoTree src={decoTrees.pineB} side="right" width="clamp(100px, 12vw, 185px)" opacity={0.4} />
 
-        <div className="mx-auto max-w-5xl text-center">
-          <motion.h1
-            className="display text-5xl text-ink sm:text-7xl md:text-8xl"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
-            engagement photos
-          </motion.h1>
-          <motion.p
-            className="mx-auto mt-4 max-w-xl text-stone"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.45 }}
-          >
-            {galleryPhotos.length} of our favorite moments.
-          </motion.p>
-          <motion.a
-            href={guestbookZip}
-            download
-            className="mt-6 inline-flex items-center gap-2 rounded-full bg-rust px-6 py-3 text-sm font-medium text-white shadow-lg transition-colors hover:bg-rust-dark"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-          >
-            ⬇ Download all photos
-          </motion.a>
-        </div>
-
-        <div className="mx-auto mt-14 grid max-w-6xl grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 md:grid-cols-4 lg:grid-cols-5">
+        <div className="relative mx-auto grid max-w-6xl grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 md:grid-cols-4 lg:grid-cols-5">
           {galleryPhotos.map((src, i) => (
-            <button
+            <motion.button
               key={src}
-              onClick={() => openLightbox(src)}
+              onClick={() => openLightbox(src, galleryPhotos)}
               aria-label={`View engagement photo ${i + 1} of ${galleryPhotos.length}`}
-              className={`group block bg-white p-2 pb-5 shadow-[0_8px_18px_rgba(20,30,40,0.18)] transition-transform duration-300 hover:z-10 hover:rotate-0 hover:scale-[1.05] ${ROT[i % ROT.length]}`}
+              data-cursor="view"
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.15 }}
+              transition={{ duration: 0.9, delay: (i % 5) * 0.06, ease: [0.22, 1, 0.36, 1] }}
+              className="group block"
             >
-              <div className="overflow-hidden">
-                <img
-                  src={src}
-                  alt=""
-                  loading="lazy"
-                  className="aspect-square w-full object-cover"
-                />
-              </div>
-            </button>
+              <span
+                className={`block bg-white p-2 pb-5 shadow-[0_10px_24px_rgba(20,30,40,0.16)] transition-all duration-500 ease-expo group-hover:z-10 group-hover:rotate-0 group-hover:scale-[1.06] group-hover:shadow-[0_22px_40px_rgba(20,30,40,0.25)] ${
+                  ROT[i % ROT.length]
+                }`}
+              >
+                <span className="block overflow-hidden">
+                  <img
+                    src={src}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    className="aspect-square w-full object-cover transition-transform duration-[1200ms] ease-expo group-hover:scale-110"
+                  />
+                </span>
+              </span>
+            </motion.button>
           ))}
         </div>
 
-        <div className="mt-16 text-center">
+        <div className="relative mt-20 text-center">
           <button
             onClick={() => go("/")}
-            className="rounded-full border border-rust px-7 py-3 text-sm uppercase tracking-[0.2em] text-rust transition-colors hover:bg-rust hover:text-white"
+            className="rounded-full border border-gold-dark px-8 py-3.5 text-xs uppercase tracking-[0.3em] text-gold-dark transition-colors duration-500 hover:bg-night hover:text-ivory"
           >
             ← Back to the wedding
           </button>
