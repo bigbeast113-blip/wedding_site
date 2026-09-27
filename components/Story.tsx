@@ -210,7 +210,8 @@ export default function Story() {
     <section
       id="story"
       ref={sectionRef}
-      className="relative bg-ivory"
+      // slides up over the last, fully ivory stretch of the fly-through above
+      className="relative -mt-[28vh] bg-ivory"
       style={{ height: height ?? "420vh" }}
       aria-label="Our story"
     >
@@ -223,7 +224,8 @@ export default function Story() {
         />
         <motion.div ref={trackRef} style={{ x }} className="relative flex h-full items-center gap-[10vw] pl-[7vw] pr-[12vw] will-change-transform">
           {/* intro */}
-          <div className="flex h-full w-[80vw] shrink-0 flex-col justify-center md:w-[44vw]">
+          {/* sits high so it arrives right behind the bloom above; cue at the foot */}
+          <div className="flex h-full w-[80vw] shrink-0 flex-col justify-start pb-[12svh] pt-[13svh] md:w-[44vw] md:pb-[14svh] md:pt-[19svh]">
             <p className="text-[0.66rem] uppercase tracking-[0.5em] text-gold-dark">{story.eyebrow}</p>
             <RevealText as="h2" text={story.heading} className="display mt-4 text-[5.5rem] leading-[0.85] text-ink md:text-[10rem]" />
             <RevealText
@@ -233,7 +235,7 @@ export default function Story() {
               delay={0.3}
             />
             <motion.div
-              className="mt-10 flex items-center gap-3 text-[0.66rem] uppercase tracking-[0.4em] text-stone"
+              className="mt-auto flex items-center gap-3 text-[0.66rem] uppercase tracking-[0.4em] text-stone"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}

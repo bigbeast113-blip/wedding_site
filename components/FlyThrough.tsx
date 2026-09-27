@@ -24,6 +24,11 @@ const SLOTS = Array.from({ length: 24 }).map((_, i) => {
   return { x: Math.cos(a) * r, y: Math.sin(a) * r * 0.82, z: 1 + i * 0.62 };
 });
 const CAM_START = -1.6; // camera starts behind the nearest photo
+// The flight is over by FLIGHT_END and the sunrise bloom has filled the screen
+// by BLOOM_END; the story section then slides up over that ivory frame (it
+// overlaps the last (1 - BLOOM_END) of this section), so there's no blank gap.
+const FLIGHT_END = 0.88;
+const BLOOM_END = 0.9;
 
 function FlyPhoto({
   src,
@@ -42,7 +47,7 @@ function FlyPhoto({
 }) {
   const openLightbox = useLightbox();
   // distance from the camera to this photo
-  const d = useTransform(progress, (p) => slot.z - (CAM_START + p * (camEnd - CAM_START)));
+  const d = useTransform(progress, (p) => slot.z - (CAM_START + Math.min(1, p / FLIGHT_END) * (camEnd - CAM_START)));
   const s = useTransform(d, (v) => (v <= 0.12 ? 8.3 : Math.min(8.3, 1 / v)));
   const x = useTransform(s, (v) => `${slot.x * v}vw`);
   const y = useTransform(s, (v) => `${slot.y * v}vh`);
@@ -96,7 +101,7 @@ export default function FlyThrough() {
   // fade would pass through a muddy grey on the way from navy to ivory.)
   // The halo runs through sunrise colours (champagne → amber → dusky rose), which
   // stay luminous against the navy where a plain ivory fade turns khaki.
-  const bloom = useTransform(scrollYProgress, [0.84, 1], [-50, 100]);
+  const bloom = useTransform(scrollYProgress, [0.72, BLOOM_END], [-50, 100]);
   const dawn = useTransform(
     bloom,
     (r) =>
@@ -104,11 +109,15 @@ export default function FlyThrough() {
   );
   // the title is read first, then dissolves as the flight picks up speed
   const textOpacity = useTransform(scrollYProgress, [0, 0.4, 0.56], [1, 1, 0]);
-  const ornament = useTransform(scrollYProgress, [0.93, 1], [0, 1]);
   const textScale = useTransform(scrollYProgress, [0, 1], [0.94, 1.08]);
+  // a star + scroll cue at the heart of the light; the story never covers the
+  // middle of this frame, so it stays until the story's first lines arrive
+  const ornament = useTransform(scrollYProgress, [0.82, 0.88], [0, 1]);
 
   return (
-    <section ref={ref} data-nav-dark className="relative h-[380vh] bg-night" aria-label="A few of our favorite moments">
+    <section ref={ref} className="relative h-[380vh] bg-night" aria-label="A few of our favorite moments">
+      {/* night nav styling until the bloom reaches the top of the screen (~87%) */}
+      <div aria-hidden data-nav-dark className="pointer-events-none absolute inset-x-0 top-0 h-[calc(244vh+44px)]" />
       <div className="sticky top-0 h-svh overflow-hidden">
         <motion.div className="absolute inset-0" style={{ scale: starScale }}>
           <NightSky stars={90} />
@@ -153,12 +162,18 @@ export default function FlyThrough() {
         />
         <motion.div className="pointer-events-none absolute inset-0 z-[70]" style={{ backgroundImage: dawn }} />
         <motion.div
+          aria-hidden
           style={{ opacity: ornament }}
-          className="pointer-events-none absolute inset-0 z-[71] flex items-center justify-center gap-4"
+          className="pointer-events-none absolute inset-0 z-[71] flex flex-col items-center justify-center"
         >
-          <span className="h-px w-16 bg-gradient-to-l from-gold to-transparent md:w-28" />
-          <span className="text-sm text-gold">✦</span>
-          <span className="h-px w-16 bg-gradient-to-r from-gold to-transparent md:w-28" />
+          <div className="flex items-center gap-4">
+            <span className="h-px w-16 bg-gradient-to-l from-gold to-transparent md:w-28" />
+            <span className="text-sm text-gold">✦</span>
+            <span className="h-px w-16 bg-gradient-to-r from-gold to-transparent md:w-28" />
+          </div>
+          <span className="relative mt-6 block h-12 w-px overflow-hidden bg-gold/15">
+            <span data-deco-anim className="scroll-drip absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-transparent to-gold" />
+          </span>
         </motion.div>
       </div>
     </section>
